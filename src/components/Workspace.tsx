@@ -10,6 +10,7 @@ import { PrivateMarketsAI } from "./PrivateMarketsAI";
 import { PricingPage } from "./PricingPage";
 import { AuthPage, UserAccount } from "./AuthPage";
 import { AdminPanel } from "./AdminPanel";
+import { DealroomDataExplorer } from "./DealroomDataExplorer";
 import { 
   Terminal, ShieldCheck, Cpu, Upload, Trash2, 
   Send, HelpCircle, FileText, Check, Plus, 
@@ -42,6 +43,127 @@ export const Workspace: React.FC<WorkspaceProps> = ({
   const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
   const [isLoadingSources, setIsLoadingSources] = useState(false);
 
+  // Full-text search index state for filtering papers and docs in Source Vault
+  const [sourceSearchQuery, setSourceSearchQuery] = useState("");
+
+  // Full-text search indexing & scoring
+  const filteredSources = React.useMemo(() => {
+    if (!sourceSearchQuery.trim()) {
+      return sources;
+    }
+    
+    const queryTerms = sourceSearchQuery
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(term => term.length > 0);
+      
+    if (queryTerms.length === 0) {
+      return sources;
+    }
+    
+    // Score each document based on full-text index lookup
+    const scored = sources.map(doc => {
+      let score = 0;
+      const lowerName = doc.name.toLowerCase();
+      const lowerContent = doc.content.toLowerCase();
+      
+      // Exact whole query matches (highest weight)
+      const cleanQuery = sourceSearchQuery.toLowerCase().trim();
+      if (lowerName.includes(cleanQuery)) {
+        score += 150;
+      }
+      if (lowerContent.includes(cleanQuery)) {
+        score += 75;
+      }
+      
+      // Term-based frequency & occurrence scoring
+      queryTerms.forEach(term => {
+        // Name matches
+        if (lowerName.includes(term)) {
+          score += 30;
+          const nameOccurrences = lowerName.split(term).length - 1;
+          score += nameOccurrences * 10;
+        }
+        
+        // Content matches
+        if (lowerContent.includes(term)) {
+          score += 15;
+          const contentOccurrences = lowerContent.split(term).length - 1;
+          score += contentOccurrences * 2;
+        }
+      });
+      
+      return { doc, score };
+    });
+    
+    // Filter out documents with score 0, and sort by score descending
+    return scored
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.doc);
+  }, [sources, sourceSearchQuery]);
+
+  // Full-text highlight generator
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return <span>{text}</span>;
+    const regex = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")})`, "gi");
+    const parts = text.split(regex);
+    return (
+      <span>
+        {parts.map((part, i) => 
+          regex.test(part) ? (
+            <mark key={i} className="bg-amber-400/30 text-white font-bold px-0.5 rounded-sm">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </span>
+    );
+  };
+
+  // Full-text snippet extraction around matched terms
+  const getContentSnippetWithHighlight = (content: string, query: string) => {
+    if (!query.trim()) {
+      return <span className="line-clamp-1 block">{content}</span>;
+    }
+    
+    const lowerContent = content.toLowerCase();
+    const cleanQuery = query.toLowerCase().trim();
+    
+    let matchIdx = lowerContent.indexOf(cleanQuery);
+    if (matchIdx === -1) {
+      // Find the first matching individual term
+      const queryTerms = query
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(term => term.length > 0);
+      for (const term of queryTerms) {
+        const idx = lowerContent.indexOf(term);
+        if (idx !== -1) {
+          matchIdx = idx;
+          break;
+        }
+      }
+    }
+    
+    if (matchIdx === -1) {
+      return <span className="line-clamp-1 block">{content}</span>;
+    }
+    
+    // Extract context around the match index
+    const snippetLength = 85;
+    const start = Math.max(0, matchIdx - 20);
+    const end = Math.min(content.length, start + snippetLength);
+    let snippet = content.substring(start, end);
+    
+    if (start > 0) snippet = "..." + snippet;
+    if (end < content.length) snippet = snippet + "...";
+    
+    return <span className="block text-zinc-350">{highlightText(snippet, query)}</span>;
+  };
+
   // New Custom Document Upload State
   const [isAddingDoc, setIsAddingDoc] = useState(false);
   const [newDocName, setNewDocName] = useState("");
@@ -65,9 +187,9 @@ export const Workspace: React.FC<WorkspaceProps> = ({
     total: 0
   });
 
-  // Workspace View Mode: Grounded AI Workspace vs Dealroom VC Cockpit (expanded with security, billing, and admin routes)
+  // Workspace View Mode: Grounded AI Workspace vs Dealroom VC Cockpit (expanded with security, billing, admin, and dealroom explorer routes)
   const [workspaceMode, setWorkspaceMode] = useState<
-    "grounded_ai" | "dealroom_vc" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "pricing" | "auth" | "admin"
+    "grounded_ai" | "dealroom_vc" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "pricing" | "auth" | "admin" | "dealroom_data"
   >("grounded_ai");
 
   // Dynamic user session matching LandingPage
@@ -155,6 +277,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
 
   useEffect(() => {
     fetchSources();
+    setSourceSearchQuery(""); // Clear full-text search query on cluster change
     // Pre-populate chat history with a greeting from the active cluster persona
     setChatMessages([
       {
@@ -384,6 +507,16 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               [ DEALROOM VC COCKPIT ]
             </button>
             <button
+              onClick={() => setWorkspaceMode("dealroom_data")}
+              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                workspaceMode === "dealroom_data"
+                  ? "bg-accent text-black font-black"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              [ 🗂 DEALROOM EXPLORER ]
+            </button>
+            <button
               id="btn-workspace-mode-yellow-pages"
               onClick={() => setWorkspaceMode("yellow_pages_directory")}
               className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
@@ -550,6 +683,32 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               </button>
             </div>
 
+            {/* Pinned Full-Text Search Index Input */}
+            {sources.length > 0 && (
+              <div className="px-4 py-2.5 border-b border-border bg-black/20 shrink-0 flex items-center gap-2">
+                <div className="relative flex-grow">
+                  <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <input
+                    id="source-vault-search-input"
+                    type="text"
+                    value={sourceSearchQuery}
+                    onChange={(e) => setSourceSearchQuery(e.target.value)}
+                    placeholder="Search documents & papers by keyword..."
+                    className="w-full bg-[#050505] border border-border pl-8 pr-7 py-1 text-[10px] font-mono text-zinc-300 placeholder-zinc-650 focus:outline-none focus:border-accent"
+                  />
+                  {sourceSearchQuery && (
+                    <button
+                      onClick={() => setSourceSearchQuery("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono text-zinc-500 hover:text-white px-1"
+                      title="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Content list / dropzone placeholder */}
             <div className="flex-grow overflow-y-auto p-4 space-y-3 scrollbar-custom">
               
@@ -618,64 +777,93 @@ export const Workspace: React.FC<WorkspaceProps> = ({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="font-mono text-[9px] text-text-dim uppercase pb-1 leading-none">
-                    SELECT DOCUMENTS TO GROUND THE CURRENT PROMPT:
-                  </p>
-                  {sources.map(doc => {
-                    const isSelected = selectedSourceIds.includes(doc.id);
-                    return (
-                      <div
-                        key={doc.id}
-                        id={`source-item-${doc.id}`}
-                        onClick={() => toggleSourceSelection(doc.id)}
-                        className={`p-3 border transition-all cursor-pointer select-none flex items-start justify-between relative ${
-                          isSelected 
-                            ? "bg-surface border-accent" 
-                            : "bg-[#050505] border-border hover:border-zinc-700 text-zinc-400"
-                        }`}
+                  {sourceSearchQuery.trim() && (
+                    <div className="p-2 bg-accent/5 border border-accent/20 flex justify-between items-center rounded-none mb-3">
+                      <span className="font-mono text-[9px] font-bold text-accent uppercase tracking-wider">
+                        🔍 INDEX MATCHES: {filteredSources.length} OF {sources.length}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSourceSearchQuery("")}
+                        className="font-mono text-[9px] text-text-dim hover:text-accent underline uppercase cursor-pointer"
                       >
-                        <div className="flex gap-2.5 items-start flex-grow">
-                          <div className={`mt-0.5 border w-3.5 h-3.5 flex items-center justify-center shrink-0 ${
-                            isSelected ? "border-accent bg-accent text-black" : "border-border bg-black"
-                          }`}>
-                            {isSelected && <Check size={10} strokeWidth={3} />}
-                          </div>
-                          
-                          <div className="min-w-0 flex-grow">
-                            <span className={`font-mono text-xs font-bold block truncate uppercase ${isSelected ? "text-white" : "text-zinc-400"}`}>
-                              {doc.name}
-                            </span>
-                            <span className="text-[10px] text-text-dim line-clamp-1 mt-1 leading-normal font-mono">
-                              {doc.content}
-                            </span>
-                          </div>
-                        </div>
+                        CLEAR SEARCH
+                      </button>
+                    </div>
+                  )}
 
-                        <div className="flex items-center gap-2 pl-2">
-                          <button
-                            id={`btn-inspect-source-${doc.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setInspectedDoc(doc);
-                            }}
-                            className="text-text-dim hover:text-white cursor-pointer active:scale-90"
-                            title="Inspect document source content"
+                  {filteredSources.length === 0 ? (
+                    <div className="text-center py-12 border border-dashed border-border p-6 bg-surface/10">
+                      <Search size={20} className="mx-auto text-zinc-600 mb-2.5 animate-pulse" />
+                      <p className="font-mono text-[10px] text-text-dim uppercase font-bold">
+                        No index matches found
+                      </p>
+                      <p className="text-[9px] text-zinc-500 leading-normal mt-1">
+                        Your keyword search for "{sourceSearchQuery}" did not yield results in filenames or content.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-mono text-[9px] text-text-dim uppercase pb-1 leading-none">
+                        {sourceSearchQuery.trim() ? "RELEVANCE-SORTED SEARCH RESULTS:" : "SELECT DOCUMENTS TO GROUND THE CURRENT PROMPT:"}
+                      </p>
+                      {filteredSources.map(doc => {
+                        const isSelected = selectedSourceIds.includes(doc.id);
+                        return (
+                          <div
+                            key={doc.id}
+                            id={`source-item-${doc.id}`}
+                            onClick={() => toggleSourceSelection(doc.id)}
+                            className={`p-3 border transition-all cursor-pointer select-none flex items-start justify-between relative ${
+                              isSelected 
+                                ? "bg-surface border-accent" 
+                                : "bg-[#050505] border-border hover:border-zinc-700 text-zinc-400"
+                            }`}
                           >
-                            <Info size={11} />
-                          </button>
-                          
-                          <button
-                            id={`btn-delete-source-${doc.id}`}
-                            onClick={(e) => handleDeleteSource(doc.id, e)}
-                            className="text-zinc-650 hover:text-red-450 cursor-pointer active:scale-90"
-                            title="Delete file"
-                          >
-                            <Trash2 size={11} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                            <div className="flex gap-2.5 items-start flex-grow">
+                              <div className={`mt-0.5 border w-3.5 h-3.5 flex items-center justify-center shrink-0 ${
+                                isSelected ? "border-accent bg-accent text-black" : "border-border bg-black"
+                              }`}>
+                                {isSelected && <Check size={10} strokeWidth={3} />}
+                              </div>
+                              
+                              <div className="min-w-0 flex-grow">
+                                <span className={`font-mono text-xs font-bold block truncate uppercase ${isSelected ? "text-white" : "text-zinc-400"}`}>
+                                  {highlightText(doc.name, sourceSearchQuery)}
+                                </span>
+                                <div className="text-[10px] text-text-dim mt-1 leading-relaxed font-mono">
+                                  {getContentSnippetWithHighlight(doc.content, sourceSearchQuery)}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 pl-2">
+                              <button
+                                id={`btn-inspect-source-${doc.id}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setInspectedDoc(doc);
+                                }}
+                                className="text-text-dim hover:text-white cursor-pointer active:scale-90"
+                                title="Inspect document source content"
+                              >
+                                <Info size={11} />
+                              </button>
+                              
+                              <button
+                                id={`btn-delete-source-${doc.id}`}
+                                onClick={(e) => handleDeleteSource(doc.id, e)}
+                                className="text-zinc-650 hover:text-red-450 cursor-pointer active:scale-90"
+                                title="Delete file"
+                              >
+                                <Trash2 size={11} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -895,6 +1083,10 @@ export const Workspace: React.FC<WorkspaceProps> = ({
         ) : workspaceMode === "dealroom_vc" ? (
           <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden">
             <DealroomVC onAppendToCanvas={appendToCanvas} userEmail={userEmail} />
+          </div>
+        ) : workspaceMode === "dealroom_data" ? (
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
+            <DealroomDataExplorer />
           </div>
         ) : workspaceMode === "yellow_pages_directory" ? (
           <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">

@@ -7,6 +7,7 @@ import { PrivateMarketsAI } from "./PrivateMarketsAI";
 import { PricingPage } from "./PricingPage";
 import { AuthPage, UserAccount } from "./AuthPage";
 import { AdminPanel } from "./AdminPanel";
+import { DealroomDataExplorer } from "./DealroomDataExplorer";
 import { 
   ShieldCheck, ArrowRight, Sparkles, Terminal, Activity, FileText, 
   TrendingUp, Cpu, RefreshCw, ShoppingCart, Loader2, Search, Plus, 
@@ -60,9 +61,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onRefreshLogs,
   onActivateTrial
 }) => {
-  // Navigation: expanded with new pricing, security, and administrative tabs
+  // Navigation: expanded with new pricing, security, administrative, and dealroom explorer tabs
   const [activeTab, setActiveTab] = useState<
-    "portal_hub" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "about_us" | "pricing" | "auth" | "admin"
+    "portal_hub" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "about_us" | "pricing" | "auth" | "admin" | "dealroom_data"
   >("portal_hub");
   
   // Dynamic user session state synced with local persistence
@@ -376,6 +377,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               }`}
             >
               [ PORTAL HUB COCKPIT ]
+            </button>
+            <button
+              onClick={() => setActiveTab("dealroom_data")}
+              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
+                activeTab === "dealroom_data"
+                  ? "bg-black text-white"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              [ 🗂 DEALROOM EXPLORER ]
             </button>
             <button
               onClick={() => setActiveTab("yellow_pages_directory")}
@@ -964,6 +975,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </aside>
 
           </div>
+        ) : activeTab === "dealroom_data" ? (
+          <DealroomDataExplorer />
         ) : activeTab === "yellow_pages_directory" ? (
           <YellowPagesDirectory />
         ) : activeTab === "yellow_pages_repositories" ? (
