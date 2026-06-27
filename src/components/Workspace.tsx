@@ -6,11 +6,16 @@ import { DealroomVC } from "./DealroomVC";
 import { YellowPagesDirectory } from "./YellowPagesDirectory";
 import { YellowPagesRepositories } from "./YellowPagesRepositories";
 import { SocialSentimentDeck } from "./SocialSentimentDeck";
+import { PrivateMarketsAI } from "./PrivateMarketsAI";
+import { PricingPage } from "./PricingPage";
+import { AuthPage, UserAccount } from "./AuthPage";
+import { AdminPanel } from "./AdminPanel";
 import { 
   Terminal, ShieldCheck, Cpu, Upload, Trash2, 
   Send, HelpCircle, FileText, Check, Plus, 
   ChevronRight, RefreshCw, Layers, Edit, 
-  ArrowLeft, Info, Copy, Sparkles, BookOpen
+  ArrowLeft, Info, Copy, Sparkles, BookOpen,
+  Lock, Unlock, Command, UserPlus, Search
 } from "lucide-react";
 
 interface WorkspaceProps {
@@ -60,8 +65,20 @@ export const Workspace: React.FC<WorkspaceProps> = ({
     total: 0
   });
 
-  // Workspace View Mode: Grounded AI Workspace vs Dealroom VC Cockpit
-  const [workspaceMode, setWorkspaceMode] = useState<"grounded_ai" | "dealroom_vc" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment">("grounded_ai");
+  // Workspace View Mode: Grounded AI Workspace vs Dealroom VC Cockpit (expanded with security, billing, and admin routes)
+  const [workspaceMode, setWorkspaceMode] = useState<
+    "grounded_ai" | "dealroom_vc" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "pricing" | "auth" | "admin"
+  >("grounded_ai");
+
+  // Dynamic user session matching LandingPage
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const saved = localStorage.getItem("avantgarde_current_user");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Global search overlays for Workspace Cockpit
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
 
   // Token history per cognitive cluster
   const [clusterTokenHistory, setClusterTokenHistory] = useState<Record<number, Array<{ timestamp: string; input: number; output: number; total: number; query: string }>>>({
@@ -398,6 +415,65 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               }`}
             >
               [ SOCIAL AI SENTIMENT ]
+            </button>
+            <button
+              id="btn-workspace-mode-private-markets"
+              onClick={() => setWorkspaceMode("private_markets")}
+              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                workspaceMode === "private_markets"
+                  ? "bg-accent text-black font-black"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              [ PRIVATE MARKETS & STARTUPS ]
+            </button>
+            <button
+              onClick={() => setWorkspaceMode("pricing")}
+              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                workspaceMode === "pricing"
+                  ? "bg-accent text-black font-black"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              [ PRICING ]
+            </button>
+            <button
+              onClick={() => setWorkspaceMode("auth")}
+              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                workspaceMode === "auth"
+                  ? "bg-accent text-black font-black"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              <UserPlus size={10} />
+              {currentUser ? `[ ${currentUser.fullName.split(" ")[0].toUpperCase()} ]` : "[ SIGN IN ]"}
+            </button>
+            <button
+              onClick={() => {
+                if (currentUser?.role === "admin") {
+                  setWorkspaceMode("admin");
+                } else {
+                  setWorkspaceMode("auth");
+                  alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
+                }
+              }}
+              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                workspaceMode === "admin"
+                  ? "bg-accent text-black font-black"
+                  : currentUser?.role === "admin"
+                  ? "text-[#00ff66] font-extrabold hover:text-[#00ff66]"
+                  : "text-zinc-500 hover:text-white"
+              }`}
+            >
+              {currentUser?.role === "admin" ? <Unlock size={10} className="text-[#00ff66] animate-pulse" /> : <Lock size={10} />}
+              [ ADMIN ]
+            </button>
+            <button
+              onClick={() => setShowGlobalSearch(true)}
+              className="px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer bg-accent text-black hover:bg-[#00e08b] transition-colors flex items-center gap-1"
+              title="Open Global Search (Ctrl+K)"
+            >
+              <Command size={10} /> [ SEARCH ]
             </button>
           </div>
         </div>
@@ -828,9 +904,57 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
             <YellowPagesRepositories />
           </div>
-        ) : (
+        ) : workspaceMode === "private_markets" ? (
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
+            <PrivateMarketsAI />
+          </div>
+        ) : workspaceMode === "social_sentiment" ? (
           <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
             <SocialSentimentDeck />
+          </div>
+        ) : workspaceMode === "pricing" ? (
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
+            <PricingPage />
+          </div>
+        ) : workspaceMode === "auth" ? (
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
+            <AuthPage 
+              currentUser={currentUser} 
+              onLoginSuccess={(usr) => {
+                setCurrentUser(usr);
+                localStorage.setItem("avantgarde_current_user", JSON.stringify(usr));
+                if (usr.role === "admin") {
+                  setWorkspaceMode("admin");
+                } else {
+                  setWorkspaceMode("grounded_ai");
+                }
+              }} 
+              onLogout={() => {
+                setCurrentUser(null);
+                localStorage.removeItem("avantgarde_current_user");
+                setWorkspaceMode("grounded_ai");
+              }} 
+            />
+          </div>
+        ) : (
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
+            {currentUser?.role === "admin" ? (
+              <AdminPanel />
+            ) : (
+              <div className="p-8 text-center font-mono space-y-4">
+                <Lock className="mx-auto text-red-600" size={32} />
+                <h3 className="text-sm font-black text-black">SECURITY SYSTEM BLOCK</h3>
+                <p className="text-[11px] text-zinc-600 max-w-md mx-auto leading-relaxed">
+                  Your current session does not hold root administrative clearance keys. Please authenticate under a System Admin role profile.
+                </p>
+                <button
+                  onClick={() => setWorkspaceMode("auth")}
+                  className="px-4 py-2 border border-black bg-black text-white text-xs font-bold uppercase hover:bg-zinc-800"
+                >
+                  PROCEED TO GATEWAY
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -917,6 +1041,133 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               <span>COMMITTED: {new Date(inspectedDoc.uploadedAt).toLocaleString()}</span>
               <span>CLUSTER ID: {inspectedDoc.clusterId}</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Command Center Search Modal */}
+      {showGlobalSearch && (
+        <div id="global-search-overlay" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-start justify-center p-4 pt-20">
+          <div className="bg-white border-2 border-black max-w-xl w-full p-5 relative text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-in fade-in duration-200">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-3 mb-4">
+              <span className="font-mono text-[9px] font-bold bg-black text-white px-2 py-0.5 uppercase tracking-widest flex items-center gap-1">
+                <Command size={10} /> AVANT-GARDE GLOBAL SEARCH SYSTEM
+              </span>
+              <button
+                onClick={() => {
+                  setShowGlobalSearch(false);
+                  setGlobalSearchQuery("");
+                }}
+                className="text-red-600 hover:underline font-mono font-black text-[10px]"
+              >
+                [X] DISMISS
+              </button>
+            </div>
+
+            {/* Input bar */}
+            <div className="relative">
+              <span className="absolute left-3 top-3 text-zinc-400">
+                <Search size={16} />
+              </span>
+              <input
+                type="text"
+                autoFocus
+                value={globalSearchQuery}
+                onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                placeholder="Search anything (e.g. Amana, arabic, Llama, JurisAgent)..."
+                className="w-full bg-zinc-50 border border-zinc-350 p-3 pl-10 text-xs focus:outline-none focus:border-black font-mono text-black placeholder-zinc-400"
+              />
+            </div>
+
+            {/* Search results cataloging */}
+            <div className="mt-4 max-h-[300px] overflow-y-auto space-y-2 pr-1 font-mono">
+              <span className="text-[8px] text-zinc-450 uppercase tracking-widest block font-bold mb-1.5 border-b border-dashed border-zinc-150 pb-1">
+                Registry Index Match List
+              </span>
+
+              {(() => {
+                const searchItems = [
+                  // Agencies
+                  { id: "ag-1", name: "Amana Tech Lab", type: "AGENCY", desc: "Premier Middle-East systems integrator specializing in custom corporate multi-agent workflows.", category: "yellow_pages_directory" },
+                  { id: "ag-2", name: "Dune AI Solutions", type: "AGENCY", desc: "Leading deeptech hub focusing on fine-tuning large Arabic language models.", category: "yellow_pages_directory" },
+                  { id: "ag-3", name: "Byblos Digital Studio", type: "AGENCY", desc: "High-fidelity digital design studio specializing in minimalist UI/UX.", category: "yellow_pages_directory" },
+                  { id: "ag-4", name: "Nile Generative Systems", type: "AGENCY", desc: "Agile engineering squad producing lightweight AI agents.", category: "yellow_pages_directory" },
+                  { id: "ag-5", name: "Oasis Systems", type: "AGENCY", desc: "Bespoke spatial computing and computer vision agency deploying smart transit grids.", category: "yellow_pages_directory" },
+                  { id: "ag-6", name: "Petra AI Consulting", type: "AGENCY", desc: "Specialized consultancy implementing document search (RAG) models.", category: "yellow_pages_directory" },
+                  // Repositories
+                  { id: "repo-1", name: "menalm-rag-ingestion", type: "REPOSITORY", desc: "Sovereign PDF parser and HNSW hierarchical vector index pipeline.", category: "yellow_pages_repositories" },
+                  { id: "repo-2", name: "dune-arabic-llama-weights", type: "REPOSITORY", desc: "Fine-tuning scripts, quantization configs, and adapters mapping 4-bit Llama.", category: "yellow_pages_repositories" },
+                  { id: "repo-3", name: "react-monospace-agent-canvas", type: "REPOSITORY", desc: "Monospace Canvas playground styled like terminal interfaces.", category: "yellow_pages_repositories" },
+                  { id: "repo-4", name: "nile-node-scraping-orchestrator", type: "REPOSITORY", desc: "Resilient server-side crawler to ingest public agricultural databases.", category: "yellow_pages_repositories" },
+                  // Startups
+                  { id: "su-1", name: "JurisAgent AI", type: "STARTUP", desc: "Autonomous contract compliance agent checking regional regulatory guidelines.", category: "private_markets" },
+                  { id: "su-2", name: "Synaptic Fabric", type: "STARTUP", desc: "Low-latency orchestration layer designed to link server-side vector scrapers.", category: "private_markets" },
+                  { id: "su-3", name: "Veritas Vector Audit", type: "STARTUP", desc: "Continuous scanning nodes verifying that client vector registries do not leak data.", category: "private_markets" }
+                ];
+
+                const filtered = searchItems.filter(item => 
+                  !globalSearchQuery || 
+                  item.name.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+                  item.desc.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+                  item.type.toLowerCase().includes(globalSearchQuery.toLowerCase())
+                );
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center p-6 text-zinc-450 border border-dashed border-zinc-200 text-[10px] uppercase">
+                      No system-level search matches found. Try another query term.
+                    </div>
+                  );
+                }
+
+                return filtered.map(item => {
+                  const badgeColor = 
+                    item.type === "AGENCY" 
+                      ? "bg-green-100 text-green-800 border-green-300" 
+                      : item.type === "REPOSITORY" 
+                      ? "bg-blue-100 text-blue-800 border-blue-300" 
+                      : "bg-purple-100 text-purple-800 border-purple-300";
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setWorkspaceMode(item.category as any);
+                        setShowGlobalSearch(false);
+                        setGlobalSearchQuery("");
+                      }}
+                      className="p-2.5 border border-zinc-200 bg-zinc-50 hover:bg-black hover:text-white hover:border-black cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2 group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[8px] font-bold px-1.5 py-0.5 border uppercase ${badgeColor}`}>
+                            {item.type}
+                          </span>
+                          <span className="font-bold text-xs uppercase group-hover:text-[#00ff66]">
+                            {item.name}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 leading-tight group-hover:text-zinc-300 font-sans">
+                          {item.desc}
+                        </p>
+                      </div>
+
+                      <span className="text-[9px] text-zinc-400 font-mono tracking-wider text-right shrink-0">
+                        LAUNCH WORKSPACE ↗
+                      </span>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Micro instruction footer */}
+            <div className="mt-4 pt-3 border-t border-zinc-150 text-[9px] text-zinc-400 text-center font-sans">
+              Press <kbd className="bg-zinc-100 border px-1 rounded font-mono text-[10px] text-black">ESC</kbd> or click closing button to terminate query mode.
+            </div>
+
           </div>
         </div>
       )}

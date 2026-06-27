@@ -3,10 +3,14 @@ import { ClusterInfo, CLUSTERS } from "../types";
 import { YellowPagesDirectory } from "./YellowPagesDirectory";
 import { YellowPagesRepositories } from "./YellowPagesRepositories";
 import { SocialSentimentDeck } from "./SocialSentimentDeck";
+import { PrivateMarketsAI } from "./PrivateMarketsAI";
+import { PricingPage } from "./PricingPage";
+import { AuthPage, UserAccount } from "./AuthPage";
+import { AdminPanel } from "./AdminPanel";
 import { 
   ShieldCheck, ArrowRight, Sparkles, Terminal, Activity, FileText, 
   TrendingUp, Cpu, RefreshCw, ShoppingCart, Loader2, Search, Plus, 
-  Globe, LineChart, BookOpen, Share2, HelpCircle, Check, Award
+  Globe, LineChart, BookOpen, Share2, HelpCircle, Check, Award, Lock, Unlock, Command, LogOut, CheckSquare, UserPlus
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -56,8 +60,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onRefreshLogs,
   onActivateTrial
 }) => {
-  // Navigation: "portal_hub" (default redesigned) vs "about_us" (previous landing contents converted to about us)
-  const [activeTab, setActiveTab] = useState<"portal_hub" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "about_us">("portal_hub");
+  // Navigation: expanded with new pricing, security, and administrative tabs
+  const [activeTab, setActiveTab] = useState<
+    "portal_hub" | "yellow_pages_directory" | "yellow_pages_repositories" | "social_sentiment" | "private_markets" | "about_us" | "pricing" | "auth" | "admin"
+  >("portal_hub");
+  
+  // Dynamic user session state synced with local persistence
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const saved = localStorage.getItem("avantgarde_current_user");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Global search command deck state
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
   
   // Previous states preserved
   const [activeHoverCluster, setActiveHoverCluster] = useState<number | null>(null);
@@ -382,6 +398,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               [ REPOSITORIES ]
             </button>
             <button
+              id="btn-active-tab-social-sentiment"
               onClick={() => setActiveTab("social_sentiment")}
               className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
                 activeTab === "social_sentiment"
@@ -392,6 +409,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               [ SOCIAL AI SENTIMENT ]
             </button>
             <button
+              id="btn-active-tab-private-markets"
+              onClick={() => setActiveTab("private_markets")}
+              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
+                activeTab === "private_markets"
+                  ? "bg-black text-white"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              [ PRIVATE MARKETS & STARTUPS ]
+            </button>
+            <button
               onClick={() => setActiveTab("about_us")}
               className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
                 activeTab === "about_us"
@@ -400,6 +428,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               }`}
             >
               [ ABOUT US & GATEWAY ]
+            </button>
+            <button
+              onClick={() => setActiveTab("pricing")}
+              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
+                activeTab === "pricing"
+                  ? "bg-black text-white"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              [ PRICING ]
+            </button>
+            <button
+              onClick={() => setActiveTab("auth")}
+              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                activeTab === "auth"
+                  ? "bg-black text-white"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <UserPlus size={10} />
+              {currentUser ? `[ ${currentUser.fullName.split(" ")[0].toUpperCase()} ]` : "[ SIGN IN / SIGN UP ]"}
+            </button>
+            <button
+              onClick={() => {
+                if (currentUser?.role === "admin") {
+                  setActiveTab("admin");
+                } else {
+                  setActiveTab("auth");
+                  alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
+                }
+              }}
+              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                activeTab === "admin"
+                  ? "bg-black text-white"
+                  : currentUser?.role === "admin"
+                  ? "text-green-600 hover:text-green-700 font-extrabold"
+                  : "text-zinc-400 hover:text-black"
+              }`}
+            >
+              {currentUser?.role === "admin" ? <Unlock size={10} className="text-green-600 animate-pulse" /> : <Lock size={10} />}
+              [ ADMIN COCKPIT ]
+            </button>
+            <button
+              onClick={() => setShowGlobalSearch(true)}
+              className="px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer bg-zinc-900 text-[#00ff66] hover:bg-black transition-colors flex items-center gap-1 border border-[#00ff66]/40"
+              title="Open Global Search (Ctrl+K)"
+            >
+              <Command size={10} /> [ SEARCH COCKPIT ]
             </button>
           </div>
         </div>
@@ -894,6 +970,46 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <YellowPagesRepositories />
         ) : activeTab === "social_sentiment" ? (
           <SocialSentimentDeck />
+        ) : activeTab === "private_markets" ? (
+          <PrivateMarketsAI />
+        ) : activeTab === "pricing" ? (
+          <PricingPage />
+        ) : activeTab === "auth" ? (
+          <AuthPage 
+            currentUser={currentUser} 
+            onLoginSuccess={(usr) => {
+              setCurrentUser(usr);
+              localStorage.setItem("avantgarde_current_user", JSON.stringify(usr));
+              if (usr.role === "admin") {
+                setActiveTab("admin");
+              } else {
+                setActiveTab("portal_hub");
+              }
+            }} 
+            onLogout={() => {
+              setCurrentUser(null);
+              localStorage.removeItem("avantgarde_current_user");
+              setActiveTab("portal_hub");
+            }} 
+          />
+        ) : activeTab === "admin" ? (
+          currentUser?.role === "admin" ? (
+            <AdminPanel />
+          ) : (
+            <div className="p-8 text-center font-mono space-y-4">
+              <Lock className="mx-auto text-red-600" size={32} />
+              <h3 className="text-sm font-black text-black">SECURITY SYSTEM BLOCK</h3>
+              <p className="text-[11px] text-zinc-600 max-w-md mx-auto leading-relaxed">
+                Your current session does not hold root administrative clearance keys. Please authenticate under a System Admin role profile.
+              </p>
+              <button
+                onClick={() => setActiveTab("auth")}
+                className="px-4 py-2 border border-black bg-black text-white text-xs font-bold uppercase hover:bg-zinc-800"
+              >
+                PROCEED TO GATEWAY
+              </button>
+            </div>
+          )
         ) : (
           /* ======================================================== */
           /* THE ORIGINAL LANDING PAGE: ABOUT US & COCKPIT GATEWAY    */
@@ -1370,6 +1486,133 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Global Command Center Search Modal */}
+      {showGlobalSearch && (
+        <div id="global-search-overlay" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start justify-center p-4 pt-20">
+          <div className="bg-white border-2 border-black max-w-xl w-full p-5 relative text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-in fade-in duration-200">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-zinc-200 pb-3 mb-4">
+              <span className="font-mono text-[9px] font-bold bg-black text-white px-2 py-0.5 uppercase tracking-widest flex items-center gap-1">
+                <Command size={10} /> AVANT-GARDE GLOBAL SEARCH SYSTEM
+              </span>
+              <button
+                onClick={() => {
+                  setShowGlobalSearch(false);
+                  setGlobalSearchQuery("");
+                }}
+                className="text-red-600 hover:underline font-mono font-black text-[10px]"
+              >
+                [X] DISMISS
+              </button>
+            </div>
+
+            {/* Input bar */}
+            <div className="relative">
+              <span className="absolute left-3 top-3 text-zinc-400">
+                <Search size={16} />
+              </span>
+              <input
+                type="text"
+                autoFocus
+                value={globalSearchQuery}
+                onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                placeholder="Search anything (e.g. Amana, arabic, Llama, JurisAgent)..."
+                className="w-full bg-zinc-50 border border-zinc-350 p-3 pl-10 text-xs focus:outline-none focus:border-black font-mono text-black placeholder-zinc-400"
+              />
+            </div>
+
+            {/* Search results cataloging */}
+            <div className="mt-4 max-h-[340px] overflow-y-auto space-y-2 pr-1 font-mono">
+              <span className="text-[8px] text-zinc-450 uppercase tracking-widest block font-bold mb-1.5 border-b border-dashed border-zinc-150 pb-1">
+                Registry Index Match List
+              </span>
+
+              {(() => {
+                const searchItems = [
+                  // Agencies
+                  { id: "ag-1", name: "Amana Tech Lab", type: "AGENCY", desc: "Premier Middle-East systems integrator specializing in custom corporate multi-agent workflows.", category: "yellow_pages_directory" },
+                  { id: "ag-2", name: "Dune AI Solutions", type: "AGENCY", desc: "Leading deeptech hub focusing on fine-tuning large Arabic language models.", category: "yellow_pages_directory" },
+                  { id: "ag-3", name: "Byblos Digital Studio", type: "AGENCY", desc: "High-fidelity digital design studio specializing in minimalist UI/UX.", category: "yellow_pages_directory" },
+                  { id: "ag-4", name: "Nile Generative Systems", type: "AGENCY", desc: "Agile engineering squad producing lightweight AI agents.", category: "yellow_pages_directory" },
+                  { id: "ag-5", name: "Oasis Systems", type: "AGENCY", desc: "Bespoke spatial computing and computer vision agency deploying smart transit grids.", category: "yellow_pages_directory" },
+                  { id: "ag-6", name: "Petra AI Consulting", type: "AGENCY", desc: "Specialized consultancy implementing document search (RAG) models.", category: "yellow_pages_directory" },
+                  // Repositories
+                  { id: "repo-1", name: "menalm-rag-ingestion", type: "REPOSITORY", desc: "Sovereign PDF parser and HNSW hierarchical vector index pipeline.", category: "yellow_pages_repositories" },
+                  { id: "repo-2", name: "dune-arabic-llama-weights", type: "REPOSITORY", desc: "Fine-tuning scripts, quantization configs, and adapters mapping 4-bit Llama.", category: "yellow_pages_repositories" },
+                  { id: "repo-3", name: "react-monospace-agent-canvas", type: "REPOSITORY", desc: "Monospace Canvas playground styled like terminal interfaces.", category: "yellow_pages_repositories" },
+                  { id: "repo-4", name: "nile-node-scraping-orchestrator", type: "REPOSITORY", desc: "Resilient server-side crawler to ingest public agricultural databases.", category: "yellow_pages_repositories" },
+                  // Startups
+                  { id: "su-1", name: "JurisAgent AI", type: "STARTUP", desc: "Autonomous contract compliance agent checking regional regulatory guidelines.", category: "private_markets" },
+                  { id: "su-2", name: "Synaptic Fabric", type: "STARTUP", desc: "Low-latency orchestration layer designed to link server-side vector scrapers.", category: "private_markets" },
+                  { id: "su-3", name: "Veritas Vector Audit", type: "STARTUP", desc: "Continuous scanning nodes verifying that client vector registries do not leak data.", category: "private_markets" }
+                ];
+
+                const filtered = searchItems.filter(item => 
+                  !globalSearchQuery || 
+                  item.name.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+                  item.desc.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+                  item.type.toLowerCase().includes(globalSearchQuery.toLowerCase())
+                );
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center p-6 text-zinc-450 border border-dashed border-zinc-200 text-[10px] uppercase">
+                      No system-level search matches found. Try another query term.
+                    </div>
+                  );
+                }
+
+                return filtered.map(item => {
+                  const badgeColor = 
+                    item.type === "AGENCY" 
+                      ? "bg-green-100 text-green-800 border-green-300" 
+                      : item.type === "REPOSITORY" 
+                      ? "bg-blue-100 text-blue-800 border-blue-300" 
+                      : "bg-purple-100 text-purple-800 border-purple-300";
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.category as any);
+                        setShowGlobalSearch(false);
+                        setGlobalSearchQuery("");
+                      }}
+                      className="p-2.5 border border-zinc-200 bg-zinc-50 hover:bg-black hover:text-white hover:border-black cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2 group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[8px] font-bold px-1.5 py-0.5 border uppercase ${badgeColor}`}>
+                            {item.type}
+                          </span>
+                          <span className="font-bold text-xs uppercase group-hover:text-[#00ff66]">
+                            {item.name}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 leading-tight group-hover:text-zinc-300 font-sans">
+                          {item.desc}
+                        </p>
+                      </div>
+
+                      <span className="text-[9px] text-zinc-400 font-mono tracking-wider text-right shrink-0">
+                        LAUNCH WORKSPACE ↗
+                      </span>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Micro instruction footer */}
+            <div className="mt-4 pt-3 border-t border-zinc-150 text-[9px] text-zinc-400 text-center font-sans">
+              Press <kbd className="bg-zinc-100 border px-1 rounded font-mono text-[10px] text-black">ESC</kbd> or click closing button to terminate query mode.
+            </div>
+
           </div>
         </div>
       )}

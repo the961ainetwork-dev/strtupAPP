@@ -471,87 +471,93 @@ export const YellowPagesDirectory: React.FC = () => {
           NO VETTED AGENCIES FOUND MATCHING THE ACTIVE SEARCH FILTERS.
         </div>
       ) : (
-        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4 [column-fill:_balance]">
-          {filteredAgencies.map(agency => (
-            <div
-              key={agency.id}
-              className="break-inside-avoid bg-white border border-border p-4 space-y-3.5 hover:border-black transition-all flex flex-col justify-between group"
-            >
-              {/* Header Info */}
-              <div className="flex justify-between items-start gap-2 border-b border-zinc-100 pb-2">
-                <div>
-                  <span className="text-[8px] bg-zinc-100 text-zinc-700 border border-zinc-200 px-1.5 py-0.5 font-bold tracking-wider uppercase block w-max">
-                    {agency.type}
-                  </span>
-                  <h3 className="font-black text-[13px] text-black uppercase mt-1.5 leading-tight group-hover:underline">
-                    {agency.name}
-                  </h3>
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 space-y-5 [column-fill:_balance]">
+          {filteredAgencies.map((agency, index) => {
+            // Generate deterministic staggered styles based on index to simulate Pinterest aesthetic heights
+            const staggerPadding = index % 3 === 0 ? "pb-6" : index % 3 === 1 ? "pb-4" : "pb-8";
+            const borderAccent = index % 4 === 0 ? "border-l-4 border-l-black" : index % 4 === 1 ? "border-l-4 border-l-green-600" : index % 4 === 2 ? "border-l-4 border-l-amber-500" : "border-l-4 border-l-blue-600";
+            
+            return (
+              <div
+                key={agency.id}
+                className={`break-inside-avoid bg-white border border-border p-5 space-y-4 hover:border-black hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group rounded-none cursor-default ${staggerPadding} ${borderAccent}`}
+              >
+                {/* Header Info */}
+                <div className="flex justify-between items-start gap-2 border-b border-zinc-150 pb-2">
+                  <div>
+                    <span className="text-[8px] bg-zinc-900 text-white border border-black px-2 py-0.5 font-bold tracking-widest uppercase block w-max">
+                      {agency.type}
+                    </span>
+                    <h3 className="font-black text-[13.5px] text-black uppercase mt-2 leading-tight group-hover:text-zinc-700 transition-colors">
+                      {agency.name}
+                    </h3>
+                  </div>
+
+                  {agency.vetted && (
+                    <span className="flex items-center gap-0.5 text-[8px] bg-green-50 text-green-800 border border-green-300 px-1.5 py-0.5 font-bold tracking-widest uppercase">
+                      <Shield size={9} className="text-green-700 fill-green-100" /> VETTED
+                    </span>
+                  )}
                 </div>
 
-                {agency.vetted && (
-                  <span className="flex items-center gap-0.5 text-[8px] bg-green-100 text-green-800 border border-green-200 px-1.5 py-0.5 font-bold tracking-widest uppercase">
-                    <Shield size={9} className="text-green-700" /> VETTED
-                  </span>
-                )}
-              </div>
-
-              {/* Geographic anchor */}
-              <div className="flex items-center gap-1 text-[10px] text-zinc-600 font-bold">
-                <MapPin size={11} className="text-zinc-500 shrink-0" />
-                <span className="truncate">{agency.location}, <strong className="text-black uppercase">{agency.country}</strong></span>
-              </div>
-
-              {/* Description */}
-              <p className="text-[10.5px] leading-relaxed text-zinc-700 font-sans">
-                {agency.description}
-              </p>
-
-              {/* Tags/Specialties */}
-              <div className="flex flex-wrap gap-1">
-                {agency.specialties.map(spec => (
-                  <span key={spec} className="text-[8px] bg-zinc-50 border border-border px-1.5 py-0.5 text-zinc-600 font-bold uppercase font-mono">
-                    #{spec}
-                  </span>
-                ))}
-              </div>
-
-              {/* Featured Project Panel */}
-              <div className="bg-zinc-50 border border-zinc-200 p-2.5 text-[10px] space-y-1">
-                <span className="text-[8px] font-black tracking-widest text-zinc-400 block uppercase">FLAGSHIP PILOT PROJECT</span>
-                <span className="font-bold text-black uppercase block leading-tight">{agency.featuredProject.title}</span>
-                <p className="text-zinc-600 leading-normal font-sans text-[9px]">{agency.featuredProject.description}</p>
-              </div>
-
-              {/* Meta stats */}
-              <div className="flex justify-between items-center pt-2.5 border-t border-zinc-100 text-[9px] text-zinc-500 font-mono">
-                <div>
-                  <span className="block">ESTD: <strong className="text-black">{agency.established}</strong></span>
-                  <span className="block uppercase">TEAM: <strong className="text-black">{agency.teamSize}</strong></span>
+                {/* Geographic anchor */}
+                <div className="flex items-center gap-1.5 text-[10px] text-zinc-600 font-bold">
+                  <MapPin size={11} className="text-zinc-500 shrink-0" />
+                  <span className="truncate">{agency.location}, <strong className="text-black uppercase">{agency.country}</strong></span>
                 </div>
 
-                <div className="flex gap-2">
-                  <a
-                    href={`mailto:${agency.contactEmail}`}
-                    className="p-1 border border-border hover:border-black text-black cursor-pointer bg-white"
-                    title={`Contact agency at ${agency.contactEmail}`}
-                  >
-                    <Mail size={11} />
-                  </a>
-                  <button
-                    onClick={(e) => handleLike(agency.id, e)}
-                    className={`px-2 py-1 border flex items-center gap-1 cursor-pointer font-bold ${
-                      likedAgencies[agency.id]
-                        ? "bg-black text-white border-black"
-                        : "bg-white text-zinc-600 border-border hover:border-black hover:text-black"
-                    }`}
-                  >
-                    <Heart size={10} className={likedAgencies[agency.id] ? "fill-white" : ""} /> {agency.likes}
-                  </button>
-                </div>
-              </div>
+                {/* Description */}
+                <p className="text-[10.5px] leading-relaxed text-zinc-700 font-sans">
+                  {agency.description}
+                </p>
 
-            </div>
-          ))}
+                {/* Tags/Specialties */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {agency.specialties.map(spec => (
+                    <span key={spec} className="text-[8px] bg-zinc-100 border border-zinc-200 hover:border-zinc-400 px-1.5 py-0.5 text-zinc-700 font-bold uppercase font-mono transition-colors">
+                      #{spec}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Featured Project Panel with dynamic overlay hover effect */}
+                <div className="bg-zinc-50 border border-zinc-200 p-3 text-[10px] space-y-1.5 group-hover:bg-zinc-100/60 transition-colors duration-300">
+                  <span className="text-[8px] font-black tracking-widest text-zinc-400 block uppercase font-mono">FLAGSHIP PILOT PROJECT</span>
+                  <span className="font-bold text-black uppercase block leading-tight">{agency.featuredProject.title}</span>
+                  <p className="text-zinc-600 leading-normal font-sans text-[9px]">{agency.featuredProject.description}</p>
+                </div>
+
+                {/* Meta stats */}
+                <div className="flex justify-between items-center pt-3 border-t border-zinc-150 text-[9px] text-zinc-500 font-mono">
+                  <div>
+                    <span className="block">ESTD: <strong className="text-black">{agency.established}</strong></span>
+                    <span className="block uppercase">TEAM: <strong className="text-black">{agency.teamSize}</strong></span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={`mailto:${agency.contactEmail}`}
+                      className="p-1.5 border border-border hover:border-black hover:bg-zinc-50 text-black cursor-pointer bg-white transition-colors"
+                      title={`Contact agency at ${agency.contactEmail}`}
+                    >
+                      <Mail size={12} />
+                    </a>
+                    <button
+                      onClick={(e) => handleLike(agency.id, e)}
+                      className={`px-2.5 py-1.5 border flex items-center gap-1.5 cursor-pointer font-bold transition-all ${
+                        likedAgencies[agency.id]
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-zinc-600 border-border hover:border-black hover:text-black"
+                      }`}
+                    >
+                      <Heart size={11} className={likedAgencies[agency.id] ? "fill-white" : ""} /> {agency.likes}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       )}
 
