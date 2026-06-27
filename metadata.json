@@ -1,0 +1,6 @@
+{
+  "name": "AI Portal & Notebook Workspaces",
+  "description": "An avant-garde AI portal and multi-cluster Notebook workspace modeled after Google's NotebookLM.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

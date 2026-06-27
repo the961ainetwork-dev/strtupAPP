@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Space+Grotesk:wght@400;500;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-bg: #ffffff;
+  --color-surface: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-accent: #000000;
+  --color-text-dim: #3f3f46;
+}
+
+/* Globally style all paragraph elements to be 2 points less and black color */
+p {
+  font-size: calc(100% - 2px) !important;
+  color: #000000 !important;
+}
+
+p * {
+  color: #000000 !important;
+}
+
+/* Force clean minimalist white-and-black styling globally */
+html, body, #root, 
+.bg-bg, 
+.bg-black, 
+.bg-surface,
+.bg-\[\#050505\], 
+.bg-\[\#0c0c0e\], 
+.bg-\[\#09090b\], 
+.bg-\[\#040405\], 
+.bg-\[\#111111\],
+.bg-\[\#020202\] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Secondary surface background color blocks to a soft, modern light gray */
+.bg-zinc-900, 
+.bg-zinc-950, 
+.bg-zinc-800, 
+.bg-\[\#18181b\], 
+.bg-\[\#27272a\], 
+.bg-black\/20, 
+.bg-black\/40, 
+.bg-black\/30,
+.bg-accent\/5,
+.bg-\[\#00FF9C\]\/5 {
+  background-color: #f4f4f5 !important;
+}
+
+/* Clean, modern light gray borders */
+.border-border, 
+.border-zinc-800, 
+.border-zinc-700, 
+.border-zinc-900, 
+.border-\[\#222222\],
+.border-\[\#00FF9C\]\/20 {
+  border-color: #e4e4e7 !important;
+}
+
+/* High-contrast black typography overrides */
+h1, h2, h3, h4, h5, h6, 
+.text-white, 
+.text-zinc-100, 
+.text-zinc-200, 
+.text-zinc-350, 
+.text-zinc-300, 
+.text-text-dim,
+.text-zinc-500\/80 {
+  color: #000000 !important;
+}
+
+/* Soft gray subtext overrides */
+.text-zinc-400, 
+.text-zinc-450,
+.text-zinc-500, 
+.text-zinc-600, 
+.text-zinc-650, 
+.text-zinc-700 {
+  color: #52525b !important;
+}
+
+/* Primary Black & White Accents */
+.bg-accent, 
+.bg-\[\#00FF9C\] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.text-accent, 
+.text-\[\#00FF9C\] {
+  color: #000000 !important;
+}
+
+.border-accent, 
+.border-\[\#00FF9C\] {
+  border-color: #000000 !important;
+}
+
+/* Button & interactive hover states */
+.hover\:bg-\[\#00FF9C\]:hover, 
+.hover\:bg-accent:hover {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+}
+
+/* Selected active tab styling elements */
+.border-b-accent {
+  border-bottom-color: #000000 !important;
+}
+
+/* Custom scrollbars for high-fidelity technical UI */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 2px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Remove standard scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
