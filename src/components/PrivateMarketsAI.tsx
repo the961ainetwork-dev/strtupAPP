@@ -35,7 +35,7 @@ export const PrivateMarketsAI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"directory" | "formations_feed">("directory");
   
   // Pipeline Simulation
-  const [webhookUrl, setWebhookUrl] = useState("https://api.avant-garde.internal/v1/venture-builder/ingest");
+  const [webhookUrl, setWebhookUrl] = useState("https://api.startup.internal/v1/venture-builder/ingest");
   const [webhookSent, setWebhookSent] = useState(false);
   const [isRefreshingFeed, setIsRefreshingFeed] = useState(false);
 

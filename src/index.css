@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  font-size: 17px; /* Standard browser default is 16px; 17px increases all fonts across the site by exactly 1 point */
+  font-size: 19px; /* Increased by 2 more points from 17px to 19px for custom readable sizing across all modules */
 }
 
 @theme {
@@ -16,13 +16,23 @@
   --color-text-dim: #3f3f46;
 }
 
-/* Globally style all paragraph elements to be 1 point larger and white color */
+/* Globally style all paragraph elements to be 1 point larger and default to black color */
 p {
   font-size: calc(100% - 1px) !important;
-  color: #ffffff !important;
+  color: #000000;
 }
 
 p * {
+  color: inherit;
+}
+
+/* Maintain white color inside dark layouts and specifically within dark workspaces/components */
+.dark p, 
+[class*="bg-black"] p, 
+[class*="bg-[#0c0c0e]"] p, 
+[class*="bg-[#09090b]"] p,
+[class*="bg-zinc-900"] p,
+.scrollbar-custom p {
   color: #ffffff !important;
 }
 

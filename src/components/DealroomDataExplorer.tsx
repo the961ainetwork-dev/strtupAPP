@@ -107,7 +107,7 @@ const INVESTORS_DATA = [
 const PEOPLE_DATA = [
   { name: "Dr. Amina El-Khoury", role: "Founder & Chief Scientist", company: "SovereignLLM", location: "Munich, Germany", trackRecord: "Ex-Stanford AI researcher, 15+ patents", bio: "Leads research into localized attention mechanisms and European sovereign vector infrastructure deployment." },
   { name: "Faisal Al-Jassim", role: "Managing Director", company: "Riyadh Ventures", location: "Riyadh, Saudi Arabia", trackRecord: "Invested in 18 early deeptech seed rounds", bio: "Former core operations lead at Stripe EMEA. Spearheads regional sovereign computer capital deployments." },
-  { name: "Maan Barazy", role: "Venture Builder & Architect", company: "Avant-Garde.ai", location: "Beirut / Riyadh", trackRecord: "Co-founded 4 scaleups, ex-McKinsey Tech", bio: "Designs corporate multi-agent compliance node infrastructures and manages automated private market scrapers." },
+  { name: "Maan Barazy", role: "Venture Builder & Architect", company: "Startup.ai", location: "Beirut / Riyadh", trackRecord: "Co-founded 4 scaleups, ex-McKinsey Tech", bio: "Designs corporate multi-agent compliance node infrastructures and manages automated private market scrapers." },
   { name: "Sara Larsson", role: "Angel Investor & ex-VP", company: "Independent", location: "Stockholm, Sweden", trackRecord: "Early backer of 28 SaaS startups", bio: "Former VP of Product at Spotify. Advisors to early state vector validation registries." },
   { name: "Yuki Tanaka", role: "Founder & Executive Director", company: "OrbitLogistics", location: "Tokyo, Japan", trackRecord: "Ex-JAXA deep propulsion engineer", bio: "Architected LEO mesh networks tracking orbital cargo logistics pipelines dynamically." },
   { name: "Dr. Samer Al-Aswad", role: "VP of Engineering", company: "JurisAgent AI", location: "Riyadh, Saudi Arabia", trackRecord: "Ex-Google Security, PhD in Cryptography", bio: "Specialist in zero-knowledge compliance verification nodes and multi-tier legal workspace audits." }
@@ -729,7 +729,7 @@ export const DealroomDataExplorer: React.FC = () => {
 
                 <div className="pt-2 border-t border-zinc-100 flex justify-end">
                   <a
-                    href={`mailto:contact@avant-garde.ai`}
+                    href={`mailto:contact@startup.ai`}
                     className="text-[9px] font-mono font-bold text-zinc-600 hover:text-black uppercase flex items-center gap-1 border border-zinc-200 px-2 py-1 bg-zinc-50"
                   >
                     ACQUIRE INTRODUCTION <ArrowUpRight size={10} />

@@ -30,12 +30,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
 
   // Key storage helpers
   const getUsersFromStorage = (): UserAccount[] => {
-    const raw = localStorage.getItem("avantgarde_users");
+    const raw = localStorage.getItem("startup_users");
     if (!raw) {
       // Default baseline users pre-loaded for rich administrative experience
       const defaultUsers: UserAccount[] = [
         {
-          email: "admin@avant-garde.ai",
+          email: "admin@startup.ai",
           fullName: "Maan Barazy (Administrator)",
           role: "admin",
           signUpDate: "2026-01-15",
@@ -56,14 +56,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
           status: "active"
         }
       ];
-      localStorage.setItem("avantgarde_users", JSON.stringify(defaultUsers));
+      localStorage.setItem("startup_users", JSON.stringify(defaultUsers));
       return defaultUsers;
     }
     return JSON.parse(raw);
   };
 
   const saveUsersToStorage = (users: UserAccount[]) => {
-    localStorage.setItem("avantgarde_users", JSON.stringify(users));
+    localStorage.setItem("startup_users", JSON.stringify(users));
   };
 
   const handleSignIn = (e: React.FormEvent) => {
@@ -73,7 +73,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
 
     if (password === "Maan70939779") {
       const match: UserAccount = {
-        email: "admin@avant-garde.ai",
+        email: "admin@startup.ai",
         fullName: "Maan Barazy (Administrator)",
         role: "admin",
         signUpDate: "2026-01-15",
@@ -270,7 +270,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
                   required={authMode === "signup"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={authMode === "signin" ? "Optional if using Admin Password" : "e.g. admin@avant-garde.ai"}
+                  placeholder={authMode === "signin" ? "Optional if using Admin Password" : "e.g. admin@startup.ai"}
                   className="w-full bg-surface border border-border p-2 pl-8 text-[11px] focus:outline-none focus:border-black text-black"
                 />
               </div>

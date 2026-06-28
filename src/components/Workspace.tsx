@@ -13,6 +13,7 @@ import { AdminPanel } from "./AdminPanel";
 import { DealroomDataExplorer } from "./DealroomDataExplorer";
 import { Tooltip } from "./Tooltip";
 import { ActivityChart } from "./ActivityChart";
+import { ClusterDashboard } from "./ClusterDashboard";
 import { 
   Terminal, ShieldCheck, Cpu, Upload, Trash2, 
   Send, HelpCircle, FileText, Check, Plus, 
@@ -228,6 +229,9 @@ export const Workspace: React.FC<WorkspaceProps> = ({
 
   // Inspected Source Dialog (Tooltip alternative)
   const [inspectedDoc, setInspectedDoc] = useState<SourceDocument | null>(null);
+
+  // Tab for Left Panel content (vault vs cluster analytics dashboard)
+  const [sidebarTab, setSidebarTab] = useState<"vault" | "dashboard">("vault");
 
   // Countdown state for 24h direct trial access
   const [trialTimeLeft, setTrialTimeLeft] = useState<string>("");
@@ -739,7 +743,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
                     setWorkspaceMode("admin");
                   } else {
                     setWorkspaceMode("auth");
-                    alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
+                    alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@startup.ai.");
                   }
                 }}
                 className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
@@ -883,9 +887,35 @@ export const Workspace: React.FC<WorkspaceProps> = ({
             </div>
           </Tooltip>
 
+          {/* Tabs for Sidebar content */}
+          <div className="flex border-b border-border bg-black shrink-0 font-mono text-[9px] select-none">
+            <button
+              onClick={() => setSidebarTab("vault")}
+              className={`flex-1 py-2.5 text-center font-bold tracking-wider cursor-pointer transition-all uppercase flex items-center justify-center gap-1.5 ${
+                sidebarTab === "vault" 
+                  ? "bg-[#0c0c0e] text-accent font-black border-r border-border border-b border-b-accent" 
+                  : "text-zinc-500 hover:text-zinc-300 bg-black border-r border-border"
+              }`}
+            >
+              <BookOpen size={10} /> SOURCE VAULT ({sources.length})
+            </button>
+            <button
+              onClick={() => setSidebarTab("dashboard")}
+              className={`flex-1 py-2.5 text-center font-bold tracking-wider cursor-pointer transition-all uppercase flex items-center justify-center gap-1.5 ${
+                sidebarTab === "dashboard" 
+                  ? "bg-[#0c0c0e] text-accent font-black border-b border-b-accent" 
+                  : "text-zinc-500 hover:text-zinc-300 bg-black"
+              }`}
+            >
+              <Layers size={10} /> CLUSTER VITALS
+            </button>
+          </div>
+
           {/* The Source Vault List */}
           <div className="flex-grow flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-border shrink-0 flex items-center justify-between bg-black/40">
+            {sidebarTab === "vault" ? (
+              <>
+                <div className="p-4 border-b border-border shrink-0 flex items-center justify-between bg-black/40">
               <span className="font-mono text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
                 <BookOpen size={13} className="text-text-dim" /> SOURCE VAULT ({sources.length})
               </span>
@@ -1083,6 +1113,10 @@ export const Workspace: React.FC<WorkspaceProps> = ({
                 </div>
               )}
             </div>
+            </>
+            ) : (
+              <ClusterDashboard clusterId={activeClusterId} clusterTitle={activeCluster.title} />
+            )}
           </div>
           
           <ActivityChart documentCount={sources.length} chatCount={chatMessages.length} />
@@ -1404,7 +1438,15 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           <div className="p-4 bg-black border-t border-border shrink-0 space-y-2">
             <button
               id="btn-export-pdf"
-              onClick={() => exportCanvasToPdf(canvasTitle, canvasContent, activeCluster.title)}
+              onClick={() => exportCanvasToPdf(
+                canvasTitle, 
+                canvasContent, 
+                activeCluster.title,
+                activeCluster,
+                sources.length,
+                chatMessages.length,
+                sources.map(s => s.name)
+              )}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-accent bg-accent hover:bg-[#00e08b] text-black font-mono font-bold text-xs tracking-wider uppercase cursor-pointer transition-colors"
             >
               <FileText size={14} /> EXPORT REPORT TO PDF
@@ -1463,7 +1505,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({
             {/* Modal Header */}
             <div className="flex justify-between items-center border-b border-zinc-200 pb-3 mb-4">
               <span className="font-mono text-[9px] font-bold bg-black text-white px-2 py-0.5 uppercase tracking-widest flex items-center gap-1">
-                <Command size={10} /> AVANT-GARDE GLOBAL SEARCH SYSTEM
+                <Command size={10} /> STARTUP GLOBAL SEARCH SYSTEM
               </span>
               <button
                 onClick={() => {

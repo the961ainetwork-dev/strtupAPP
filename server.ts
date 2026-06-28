@@ -100,7 +100,7 @@ function logSystemEvent(event: string, details?: string) {
 }
 
 // Initialize system log
-logSystemEvent("System Initialized", "Avant-Garde Platform server running.");
+logSystemEvent("System Initialized", "STARTUP Platform server running.");
 
 // Lazy initialize Gemini Client
 let aiInstance: GoogleGenAI | null = null;
@@ -454,6 +454,13 @@ User Query: ${message}`;
       model: "gemini-3.5-flash (Simulated Offline Engine)"
     });
   }
+});
+
+
+// Serve the service worker file with correct MIME type
+app.get("/sw.js", (req, res) => {
+  res.setHeader("Content-Type", "application/javascript");
+  res.sendFile(path.join(process.cwd(), "src", "sw.js"));
 });
 
 

@@ -278,7 +278,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                 <div className="flex items-center gap-2">
                   <Terminal size={16} className="text-accent" />
                   <span className="text-white font-black tracking-widest text-xs uppercase">
-                    Avant-Garde Platform Manual v1.2
+                    Startup Platform Manual v1.2
                   </span>
                 </div>
                 <button
@@ -341,7 +341,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                       <div>
                         <span className="text-accent font-black text-xs block uppercase">UNIFIED PIPELINE BRIEFING</span>
                         <p className="text-[11px] leading-relaxed text-zinc-300 mt-1">
-                          The Avant-Garde platform provides real-time model synthesis grounded strictly in uploaded user reference manuals. To successfully compile an audit dossier, execute the pipeline workflow mapped below.
+                          The Startup platform provides real-time model synthesis grounded strictly in uploaded user reference manuals. To successfully compile an audit dossier, execute the pipeline workflow mapped below.
                         </p>
                       </div>
                     </div>

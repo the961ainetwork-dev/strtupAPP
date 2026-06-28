@@ -79,7 +79,7 @@ export const PricingPage: React.FC = () => {
           <span className="text-[10px] text-zinc-500 font-bold uppercase block tracking-widest">ECOSYSTEM SUBSCRIPTIONS</span>
           <h2 className="text-xl font-black text-black uppercase tracking-tight flex items-center gap-2">
             <Zap size={18} className="text-black" />
-            AVANT-GARDE PORTAL PRICING
+            STARTUP PORTAL PRICING
           </h2>
           <p className="text-[11px] text-zinc-600 mt-1 max-w-2xl font-sans">
             Support the Middle-East deeptech index. Gain access to premium workflow builders, persistent cloud vaults, continuous municipal monitoring, and sovereign webhook networks.

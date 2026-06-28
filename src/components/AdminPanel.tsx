@@ -16,6 +16,7 @@ export const AdminPanel: React.FC = () => {
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [stories, setStories] = useState<SuccessStory[]>([]);
   const [activeSubTab, setActiveSubTab] = useState<"users" | "stories">("users");
+  const [selectedStoryForPopup, setSelectedStoryForPopup] = useState<SuccessStory | null>(null);
 
   // Story Form State
   const [editingStoryId, setEditingStoryId] = useState<string | null>(null);
@@ -34,13 +35,13 @@ export const AdminPanel: React.FC = () => {
   }, []);
 
   const loadUsers = () => {
-    const rawUsers = localStorage.getItem("avantgarde_users");
+    const rawUsers = localStorage.getItem("startup_users");
     if (rawUsers) {
       setUsers(JSON.parse(rawUsers));
     } else {
       const defaultUsers: UserAccount[] = [
         {
-          email: "admin@avant-garde.ai",
+          email: "admin@startup.ai",
           fullName: "Maan Barazy (Administrator)",
           role: "admin",
           signUpDate: "2026-01-15",
@@ -61,13 +62,13 @@ export const AdminPanel: React.FC = () => {
           status: "active"
         }
       ];
-      localStorage.setItem("avantgarde_users", JSON.stringify(defaultUsers));
+      localStorage.setItem("startup_users", JSON.stringify(defaultUsers));
       setUsers(defaultUsers);
     }
   };
 
   const loadStories = () => {
-    const rawStories = localStorage.getItem("avantgarde_stories");
+    const rawStories = localStorage.getItem("startup_stories");
     if (rawStories) {
       setStories(JSON.parse(rawStories));
     } else {
@@ -91,7 +92,7 @@ export const AdminPanel: React.FC = () => {
           datePublished: "2026-05-01"
         }
       ];
-      localStorage.setItem("avantgarde_stories", JSON.stringify(defaultStories));
+      localStorage.setItem("startup_stories", JSON.stringify(defaultStories));
       setStories(defaultStories);
     }
   };
@@ -106,7 +107,7 @@ export const AdminPanel: React.FC = () => {
     const updated = users.map(u => {
       if (u.email === email) {
         // Prevent disabling self
-        if (email === "admin@avant-garde.ai") {
+        if (email === "admin@startup.ai") {
           triggerNotification("Security block: Root administrator account cannot be suspended.");
           return u;
         }
@@ -116,18 +117,18 @@ export const AdminPanel: React.FC = () => {
       return u;
     });
     setUsers(updated);
-    localStorage.setItem("avantgarde_users", JSON.stringify(updated));
+    localStorage.setItem("startup_users", JSON.stringify(updated));
     triggerNotification("User account status modified successfully.");
   };
 
   const handleDeleteUser = (email: string) => {
-    if (email === "admin@avant-garde.ai") {
+    if (email === "admin@startup.ai") {
       triggerNotification("Security block: Root administrator account cannot be removed.");
       return;
     }
     const filtered = users.filter(u => u.email !== email);
     setUsers(filtered);
-    localStorage.setItem("avantgarde_users", JSON.stringify(filtered));
+    localStorage.setItem("startup_users", JSON.stringify(filtered));
     triggerNotification("User registration credentials purged from database.");
   };
 
@@ -139,7 +140,7 @@ export const AdminPanel: React.FC = () => {
       return u;
     });
     setUsers(updated);
-    localStorage.setItem("avantgarde_users", JSON.stringify(updated));
+    localStorage.setItem("startup_users", JSON.stringify(updated));
     triggerNotification(`Clearance modified successfully for ${email}.`);
   };
 
@@ -185,7 +186,7 @@ export const AdminPanel: React.FC = () => {
     }
 
     setStories(updatedStories);
-    localStorage.setItem("avantgarde_stories", JSON.stringify(updatedStories));
+    localStorage.setItem("startup_stories", JSON.stringify(updatedStories));
 
     // Clear inputs
     setEditingStoryId(null);
@@ -208,7 +209,7 @@ export const AdminPanel: React.FC = () => {
   const handleDeleteStory = (storyId: string) => {
     const filtered = stories.filter(st => st.id !== storyId);
     setStories(filtered);
-    localStorage.setItem("avantgarde_stories", JSON.stringify(filtered));
+    localStorage.setItem("startup_stories", JSON.stringify(filtered));
     triggerNotification("Success story entry removed.");
   };
 
@@ -480,6 +481,12 @@ export const AdminPanel: React.FC = () => {
 
                     <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
                       <button
+                        onClick={() => setSelectedStoryForPopup(st)}
+                        className="px-2.5 py-1 border border-black bg-zinc-50 hover:bg-black hover:text-white text-[9px] font-black uppercase cursor-pointer flex items-center gap-1 transition-all"
+                      >
+                        [ READ STORY ]
+                      </button>
+                      <button
                         onClick={() => handleStartEditStory(st)}
                         className="px-2.5 py-1 border border-zinc-300 bg-white hover:border-black text-[9px] font-bold uppercase cursor-pointer flex items-center gap-1"
                       >
@@ -500,6 +507,86 @@ export const AdminPanel: React.FC = () => {
 
           </div>
 
+        </div>
+      )}
+
+      {/* ------------------------------------------------------ */}
+      {/* SUCCESS STORY DETAIL MODAL POPUP                       */}
+      {/* ------------------------------------------------------ */}
+      {selectedStoryForPopup && (
+        <div 
+          id="success-story-modal"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setSelectedStoryForPopup(null)}
+        >
+          <div 
+            className="bg-white border border-black max-w-2xl w-full p-6 space-y-4 shadow-2xl relative select-none animate-in fade-in zoom-in duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Close Button */}
+            <button 
+              onClick={() => setSelectedStoryForPopup(null)}
+              className="absolute top-4 right-4 p-1.5 border border-black/10 hover:border-black bg-zinc-50 hover:bg-black hover:text-white transition-all cursor-pointer"
+              title="Close story panel"
+            >
+              <X size={14} />
+            </button>
+
+            {/* Header Metadata */}
+            <div className="flex items-center gap-2 border-b border-zinc-200 pb-3">
+              <span className="text-[9px] border bg-emerald-100 border-emerald-300 text-emerald-800 px-2.5 py-0.5 font-bold uppercase tracking-wider">
+                {selectedStoryForPopup.subSector}
+              </span>
+              <span className="text-[10px] text-zinc-500 font-mono font-bold uppercase">
+                PUBLISHED: {selectedStoryForPopup.datePublished}
+              </span>
+            </div>
+
+            {/* Title */}
+            <div className="space-y-1">
+              <span className="text-[9px] text-zinc-400 font-bold uppercase block tracking-widest">DEEPTECH SUCCESS STORY</span>
+              <h2 className="text-xl font-extrabold text-black uppercase leading-tight tracking-tight font-sans">
+                {selectedStoryForPopup.title}
+              </h2>
+            </div>
+
+            {/* Sponsor info */}
+            <div className="text-[11px] text-zinc-700 font-mono leading-normal">
+              SPONSOR/PARTNER: <strong className="text-black uppercase">{selectedStoryForPopup.clientName}</strong>
+            </div>
+
+            {/* Full Content Body */}
+            <div className="space-y-3 font-sans text-xs leading-relaxed text-zinc-800 select-text">
+              <p className="text-zinc-800 text-xs font-normal leading-relaxed">
+                {selectedStoryForPopup.description}
+              </p>
+            </div>
+
+            {/* Metrics Achievements Box */}
+            <div className="bg-zinc-900 border border-zinc-800 p-3.5 text-[11px] leading-relaxed text-emerald-400 font-mono font-medium flex flex-col gap-1 rounded-none">
+              <span className="text-[9px] text-zinc-500 font-bold uppercase">KEY PERFORMANCE METRICS MET</span>
+              <div className="flex items-center gap-1.5 text-xs text-[#00ff66]">
+                <Sparkles size={11} className="text-[#00ff66]" /> {selectedStoryForPopup.impactMetrics}
+              </div>
+            </div>
+
+            {/* Footer with Close buttons */}
+            <div className="flex justify-between items-center pt-4 border-t border-zinc-200 font-mono text-[10px]">
+              <div className="flex items-center gap-1 text-zinc-500">
+                REGISTRY SECURED // GCC INTEL
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setSelectedStoryForPopup(null)}
+                  className="px-4 py-1.5 bg-black hover:bg-zinc-800 text-white font-extrabold uppercase cursor-pointer"
+                >
+                  CLOSE CASE STUDY
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
       )}
 

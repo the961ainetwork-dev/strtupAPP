@@ -92,6 +92,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [newsCategory, setNewsCategory] = useState<string>("ALL");
   const [newsSearch, setNewsSearch] = useState("");
   const [selectedNews, setSelectedNews] = useState<NewswireItem | null>(null);
+  const [popupStory, setPopupStory] = useState<NewswireItem | null>(null);
   
   // Custom News Submit form states
   const [showNewsForm, setShowNewsForm] = useState(false);
@@ -365,7 +366,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Activity size={14} className="text-black" />
-            <span className="font-bold tracking-tight text-black uppercase">AVANT-GARDE PORTAL</span>
+            <span className="font-bold tracking-tight text-black uppercase">STARTUP PORTAL</span>
           </div>
 
           <div className="flex flex-wrap items-center bg-white border border-border p-0.5 gap-0.5">
@@ -753,8 +754,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                       {/* Detailed Drawer */}
                       {selectedNews?.id === item.id && (
-                        <div className="bg-surface border border-border p-3 text-[10.5px] leading-relaxed text-zinc-700 mt-2">
-                          <p className="mb-2">{item.content}</p>
+                        <div className="bg-surface border border-border p-3 text-[10.5px] leading-relaxed text-zinc-800 mt-2">
+                          <p className="mb-2 text-zinc-800 font-normal leading-relaxed">{item.content}</p>
                           <div className="text-[9px] font-bold text-black uppercase">
                             SOURCE AGENCY: {item.source}
                           </div>
@@ -767,14 +768,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                           BY: <strong className="text-black">{item.source}</strong>
                         </span>
                         
-                        <div className="flex gap-3">
+                        <div className="flex items-center gap-2">
                           <button 
                             onClick={() => {
                               setNewswire(prev => prev.map(p => p.id === item.id ? { ...p, likes: p.likes + 1 } : p));
                             }}
-                            className="hover:text-black hover:underline font-bold"
+                            className="hover:text-black hover:underline font-bold cursor-pointer"
                           >
                             ▲ RECON_UPVOTE ({item.likes})
+                          </button>
+
+                          <button 
+                            onClick={() => {
+                              setPopupStory(item);
+                            }}
+                            className="text-black font-extrabold hover:underline cursor-pointer flex items-center gap-0.5 border border-black/10 px-1.5 py-0.5 bg-zinc-50 hover:bg-black hover:text-white hover:border-black transition-all"
+                          >
+                            [ READ MORE ]
                           </button>
                         </div>
                       </div>
@@ -1017,7 +1027,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     SYSTEM MANUAL // OPERATIONAL PORTAL
                   </span>
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mt-5 text-black uppercase leading-none">
-                    AVANT-GARDE <br /><span className="text-black underline decoration-2">ABOUT US & GATEWAY</span>
+                    STARTUP <br /><span className="text-black underline decoration-2">ABOUT US & GATEWAY</span>
                   </h1>
                 </div>
                 <p className="font-mono text-xs text-zinc-600 mt-6 md:mt-12 uppercase tracking-wider">
@@ -1506,7 +1516,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Modal Header */}
             <div className="flex justify-between items-center border-b border-zinc-200 pb-3 mb-4">
               <span className="font-mono text-[9px] font-bold bg-black text-white px-2 py-0.5 uppercase tracking-widest flex items-center gap-1">
-                <Command size={10} /> AVANT-GARDE GLOBAL SEARCH SYSTEM
+                <Command size={10} /> STARTUP GLOBAL SEARCH SYSTEM
               </span>
               <button
                 onClick={() => {
@@ -1619,6 +1629,97 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Micro instruction footer */}
             <div className="mt-4 pt-3 border-t border-zinc-150 text-[9px] text-zinc-400 text-center font-sans">
               Press <kbd className="bg-zinc-100 border px-1 rounded font-mono text-[10px] text-black">ESC</kbd> or click closing button to terminate query mode.
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------ */}
+      {/* NEWS STORY DETAIL MODAL POPUP                          */}
+      {/* ------------------------------------------------------ */}
+      {popupStory && (
+        <div 
+          id="news-story-modal"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setPopupStory(null)}
+        >
+          <div 
+            className="bg-white border border-black max-w-2xl w-full p-6 space-y-4 shadow-2xl relative select-none animate-in fade-in zoom-in duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Close Button */}
+            <button 
+              onClick={() => setPopupStory(null)}
+              className="absolute top-4 right-4 p-1.5 border border-black/10 hover:border-black bg-zinc-50 hover:bg-black hover:text-white transition-all cursor-pointer"
+              title="Close story panel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header Metadata */}
+            <div className="flex items-center gap-2 border-b border-zinc-200 pb-3">
+              <span className={`text-[9px] border px-2.5 py-0.5 font-bold uppercase tracking-wider ${
+                popupStory.category === "COMPANIES" ? "bg-amber-100 border-amber-300 text-amber-800" :
+                popupStory.category === "TOOLS" ? "bg-blue-100 border-blue-300 text-blue-800" :
+                "bg-purple-100 border-purple-300 text-purple-800"
+              }`}>
+                {popupStory.category}
+              </span>
+              <span className="text-[10px] text-zinc-500 font-mono font-bold uppercase">
+                {popupStory.timestamp} // {popupStory.source}
+              </span>
+            </div>
+
+            {/* Title */}
+            <div className="space-y-1">
+              <span className="text-[9px] text-zinc-400 font-bold uppercase block tracking-widest">OFFICIAL NEWSWIRE VECTOR</span>
+              <h2 className="text-xl font-extrabold text-black uppercase leading-tight tracking-tight font-sans">
+                {popupStory.title}
+              </h2>
+            </div>
+
+            {/* Summary Box */}
+            <div className="bg-zinc-50 border-l-2 border-black p-3.5 text-[11px] leading-relaxed text-zinc-700 italic font-mono font-medium">
+              "{popupStory.summary}"
+            </div>
+
+            {/* Full Content Body */}
+            <div className="space-y-3 font-sans text-xs leading-relaxed text-zinc-800 select-text">
+              <p className="text-zinc-800 text-xs font-normal leading-relaxed">
+                {popupStory.content}
+              </p>
+              
+              <p className="text-zinc-500 text-[10px] font-mono leading-normal pt-2 border-t border-zinc-100">
+                This item is verified by the deeptech consensus registry. All content represents current telemetry logs and public domain intelligence as of June 2026.
+              </p>
+            </div>
+
+            {/* Footer with Upvote and Close buttons */}
+            <div className="flex justify-between items-center pt-4 border-t border-zinc-200 font-mono text-[10px]">
+              <div className="flex items-center gap-1 text-zinc-500">
+                SOURCE: <strong className="text-black uppercase">{popupStory.source}</strong>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => {
+                    setNewswire(prev => prev.map(p => p.id === popupStory.id ? { ...p, likes: p.likes + 1 } : p));
+                    setPopupStory(prev => prev ? { ...prev, likes: prev.likes + 1 } : null);
+                  }}
+                  className="px-3 py-1.5 border border-black/15 hover:border-black bg-zinc-50 text-black font-bold uppercase cursor-pointer flex items-center gap-1.5 active:scale-95 transition-all"
+                >
+                  ▲ UPVOTE ({popupStory.likes})
+                </button>
+                <button 
+                  onClick={() => setPopupStory(null)}
+                  className="px-4 py-1.5 bg-black hover:bg-zinc-800 text-white font-extrabold uppercase cursor-pointer"
+                >
+                  CLOSE SEGMENT
+                </button>
+              </div>
             </div>
 
           </div>
