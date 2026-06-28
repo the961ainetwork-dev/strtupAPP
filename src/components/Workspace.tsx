@@ -452,6 +452,97 @@ export const Workspace: React.FC<WorkspaceProps> = ({
     }
   };
 
+  // Compile active location path breadcrumbs
+  const getBreadcrumbs = () => {
+    const items = [
+      {
+        label: "PORTAL HUB",
+        onClick: onResetStatus,
+        tooltip: "Navigate back to the main portal system home screen",
+        active: false,
+      }
+    ];
+
+    let modeLabel = "";
+    switch (workspaceMode) {
+      case "grounded_ai":
+        modeLabel = "GROUNDED AI WORKSPACE";
+        break;
+      case "dealroom_vc":
+        modeLabel = "DEALROOM VC COCKPIT";
+        break;
+      case "dealroom_data":
+        modeLabel = "DEALROOM EXPLORER";
+        break;
+      case "yellow_pages_directory":
+        modeLabel = "YELLOW PAGES DIRECTORY";
+        break;
+      case "yellow_pages_repositories":
+        modeLabel = "REPOSITORIES INDEX";
+        break;
+      case "social_sentiment":
+        modeLabel = "SOCIAL INTEL";
+        break;
+      case "private_markets":
+        modeLabel = "PRIVATE STARTUP MARKETS";
+        break;
+      case "pricing":
+        modeLabel = "PRICING PLANS";
+        break;
+      case "auth":
+        modeLabel = "AUTHENTICATION DECK";
+        break;
+      case "admin":
+        modeLabel = "ADMIN STRATEGIC COCKPIT";
+        break;
+      default:
+        modeLabel = "SYSTEM ENVIRONMENT";
+    }
+
+    items.push({
+      label: modeLabel,
+      onClick: () => {
+        if (workspaceMode === "grounded_ai") {
+          setInspectedDoc(null);
+        }
+      },
+      tooltip: `Active module context: ${modeLabel}. Click to reset inner subviews.`,
+      active: workspaceMode !== "grounded_ai" && workspaceMode !== "dealroom_vc",
+    });
+
+    if (workspaceMode === "grounded_ai") {
+      items.push({
+        label: activeCluster.persona.toUpperCase(),
+        onClick: () => {
+          setInspectedDoc(null);
+        },
+        tooltip: `Active cognitive pillar persona: ${activeCluster.purpose}`,
+        active: !inspectedDoc,
+      });
+
+      if (inspectedDoc) {
+        items.push({
+          label: inspectedDoc.name.toUpperCase(),
+          onClick: () => {},
+          tooltip: `Currently inspecting document from vault: ${inspectedDoc.summary || inspectedDoc.name}`,
+          active: true,
+        });
+      }
+    } else {
+      // For other modes, display the active cluster to keep track of multi-cluster context
+      items.push({
+        label: `PILLAR: ${activeCluster.title.split(" & ")[0].toUpperCase()}`,
+        onClick: () => {
+          setWorkspaceMode("grounded_ai");
+        },
+        tooltip: `Active cluster context. Click to switch back to Grounded AI Chat workspace for this cluster.`,
+        active: true,
+      });
+    }
+
+    return items;
+  };
+
   return (
     <div id="workspace-container" className="h-screen flex flex-col bg-bg text-[#e0e0e0] overflow-hidden font-sans">
       
@@ -688,6 +779,38 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           </span>
         </div>
       </nav>
+
+      {/* Dynamic Breadcrumbs Navigation Strip */}
+      <div className="bg-[#08080a] border-b border-border px-6 py-2 flex items-center justify-between shrink-0 font-mono text-[10px] text-zinc-500 overflow-x-auto select-none">
+        <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+          {getBreadcrumbs().map((crumb, idx, arr) => (
+            <React.Fragment key={idx}>
+              <Tooltip position="bottom" content={crumb.tooltip}>
+                <button
+                  onClick={crumb.onClick}
+                  disabled={crumb.active}
+                  className={`transition-colors uppercase font-bold tracking-wider ${
+                    crumb.active 
+                      ? "text-accent font-black cursor-default" 
+                      : "text-zinc-400 hover:text-white cursor-pointer"
+                  }`}
+                >
+                  {crumb.label}
+                </button>
+              </Tooltip>
+              {idx < arr.length - 1 && (
+                <ChevronRight size={10} className="text-zinc-700 shrink-0" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        
+        {/* Environment metadata details */}
+        <div className="hidden sm:flex items-center gap-4 text-[9px] text-zinc-600 uppercase font-bold shrink-0">
+          <span>PILLAR_ID: <span className="text-zinc-400">00{activeClusterId}</span></span>
+          <span>INTELLIGENCE: <span className="text-[#00ff66] animate-pulse">ACTIVE FEED</span></span>
+        </div>
+      </div>
 
       {/* Workspace Three-Panel Split Grid Layout */}
       <div id="workspace-main" className="flex-grow flex flex-col lg:flex-row overflow-hidden">
