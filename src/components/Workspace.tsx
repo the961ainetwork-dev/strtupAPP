@@ -12,6 +12,7 @@ import { AuthPage, UserAccount } from "./AuthPage";
 import { AdminPanel } from "./AdminPanel";
 import { DealroomDataExplorer } from "./DealroomDataExplorer";
 import { Tooltip } from "./Tooltip";
+import { ActivityChart } from "./ActivityChart";
 import { 
   Terminal, ShieldCheck, Cpu, Upload, Trash2, 
   Send, HelpCircle, FileText, Check, Plus, 
@@ -1083,6 +1084,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
               )}
             </div>
           </div>
+          
+          <ActivityChart documentCount={sources.length} chatCount={chatMessages.length} />
         </aside>
 
         {/* ========================================================= */}
