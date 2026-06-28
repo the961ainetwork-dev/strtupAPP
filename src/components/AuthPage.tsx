@@ -71,6 +71,24 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
     setErrorMsg("");
     setSuccessMsg("");
 
+    if (password === "Maan70939779") {
+      const match: UserAccount = {
+        email: "admin@avant-garde.ai",
+        fullName: "Maan Barazy (Administrator)",
+        role: "admin",
+        signUpDate: "2026-01-15",
+        status: "active"
+      };
+      setSuccessMsg(`Session authenticated successfully as ${match.fullName}.`);
+      
+      setTimeout(() => {
+        if (onLoginSuccess) {
+          onLoginSuccess(match);
+        }
+      }, 800);
+      return;
+    }
+
     if (!email.trim() || !password) {
       setErrorMsg("Please complete all required security credentials.");
       return;
@@ -249,10 +267,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
                 </span>
                 <input
                   type="email"
-                  required
+                  required={authMode === "signup"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. admin@avant-garde.ai"
+                  placeholder={authMode === "signin" ? "Optional if using Admin Password" : "e.g. admin@avant-garde.ai"}
                   className="w-full bg-surface border border-border p-2 pl-8 text-[11px] focus:outline-none focus:border-black text-black"
                 />
               </div>
@@ -310,7 +328,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, currentUser,
           {/* Prompt info */}
           <div className="bg-zinc-50 p-2.5 border border-dashed border-zinc-200 text-[9.5px] text-zinc-500 leading-normal font-sans">
             <span className="font-bold text-black uppercase font-mono block mb-0.5">💡 Simulation Access Hint:</span>
-            To access the **Admin Console** tab directly, you can sign up with the **"System Admin Preset"** role, or sign in as `admin@avant-garde.ai` (any password works).
+            To access the **Admin Console** tab directly, you can simply use the admin password **`Maan70939779`** (no email required) to log in instantly.
           </div>
 
         </div>

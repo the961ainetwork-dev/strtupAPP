@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ClusterInfo, CLUSTERS } from "../types";
 import { YellowPagesDirectory } from "./YellowPagesDirectory";
 import { YellowPagesRepositories } from "./YellowPagesRepositories";
-import { SocialSentimentDeck } from "./SocialSentimentDeck";
+import { SocialIntelligence } from "./SocialIntelligence";
 import { PrivateMarketsAI } from "./PrivateMarketsAI";
 import { PricingPage } from "./PricingPage";
 import { AuthPage, UserAccount } from "./AuthPage";
 import { AdminPanel } from "./AdminPanel";
 import { DealroomDataExplorer } from "./DealroomDataExplorer";
+import { Tooltip } from "./Tooltip";
 import { 
   ShieldCheck, ArrowRight, Sparkles, Terminal, Activity, FileText, 
   TrendingUp, Cpu, RefreshCw, ShoppingCart, Loader2, Search, Plus, 
@@ -409,7 +410,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               [ REPOSITORIES ]
             </button>
             <button
-              id="btn-active-tab-social-sentiment"
+              id="btn-active-tab-social-intelligence"
               onClick={() => setActiveTab("social_sentiment")}
               className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors ${
                 activeTab === "social_sentiment"
@@ -417,7 +418,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   : "text-zinc-600 hover:text-black"
               }`}
             >
-              [ SOCIAL AI SENTIMENT ]
+              [ SOCIAL INTELLIGENCE ]
             </button>
             <button
               id="btn-active-tab-private-markets"
@@ -460,26 +461,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             >
               <UserPlus size={10} />
               {currentUser ? `[ ${currentUser.fullName.split(" ")[0].toUpperCase()} ]` : "[ SIGN IN / SIGN UP ]"}
-            </button>
-            <button
-              onClick={() => {
-                if (currentUser?.role === "admin") {
-                  setActiveTab("admin");
-                } else {
-                  setActiveTab("auth");
-                  alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
-                }
-              }}
-              className={`px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase cursor-pointer transition-colors flex items-center gap-1 ${
-                activeTab === "admin"
-                  ? "bg-black text-white"
-                  : currentUser?.role === "admin"
-                  ? "text-green-600 hover:text-green-700 font-extrabold"
-                  : "text-zinc-400 hover:text-black"
-              }`}
-            >
-              {currentUser?.role === "admin" ? <Unlock size={10} className="text-green-600 animate-pulse" /> : <Lock size={10} />}
-              [ ADMIN COCKPIT ]
             </button>
             <button
               onClick={() => setShowGlobalSearch(true)}
@@ -982,7 +963,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         ) : activeTab === "yellow_pages_repositories" ? (
           <YellowPagesRepositories />
         ) : activeTab === "social_sentiment" ? (
-          <SocialSentimentDeck />
+          <SocialIntelligence />
         ) : activeTab === "private_markets" ? (
           <PrivateMarketsAI />
         ) : activeTab === "pricing" ? (
@@ -1168,69 +1149,83 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {CLUSTERS.map((cluster) => {
                 const isHovered = activeHoverCluster === cluster.id;
                 return (
-                  <motion.div
+                  <Tooltip
                     key={cluster.id}
-                    onMouseEnter={() => setActiveHoverCluster(cluster.id)}
-                    onMouseLeave={() => setActiveHoverCluster(null)}
-                    whileHover={{
-                      scale: 1.015,
-                      zIndex: 10,
-                      transition: { duration: 0.15 }
-                    }}
-                    className={`p-6 border-b md:border-b-0 md:border-r border-border flex flex-col justify-between cursor-pointer relative overflow-hidden transition-colors duration-300 ${
-                      isHovered ? "bg-white text-black" : "bg-surface text-zinc-750"
-                    }`}
-                  >
-                    {/* Scrolling terminal stream background effect */}
-                    <motion.div
-                      initial={{ y: 0 }}
-                      animate={isHovered ? { y: [0, -250] } : { y: 0 }}
-                      transition={{
-                        ease: "linear",
-                        duration: 4,
-                        repeat: Infinity
-                      }}
-                      className="absolute inset-0 font-mono text-[8px] leading-none select-none pointer-events-none p-2 whitespace-nowrap overflow-hidden text-black opacity-[0.03] flex flex-col gap-1 z-0"
-                    >
-                      {Array.from({ length: 4 }).flatMap(() => SCROLLING_LINES).map((line, idx) => (
-                        <div key={idx}>{`> ${line}`}</div>
-                      ))}
-                    </motion.div>
-
-                    <div className="relative z-10">
-                      <span className={`font-mono text-[10px] font-bold tracking-widest block ${
-                        isHovered ? "text-black font-black" : "text-zinc-650"
-                      }`}>
-                        {cluster.tag}
-                      </span>
-                      
-                      <motion.h4 
-                        animate={isHovered ? {
-                          x: [0, -1.5, 1.5, -1, 1, -2, 2, 0],
-                          y: [0, 0.5, -0.5, 0, -1, 1, 0, 0],
-                        } : {}}
-                        transition={{ duration: 0.25 }}
-                        className={`text-lg font-black tracking-tight mt-3 uppercase leading-tight block ${
-                          isHovered ? "text-black" : "text-black/85"
-                        }`}
-                      >
-                        {cluster.title}
-                      </motion.h4>
-                      
-                      <p className={`text-xs mt-3 leading-relaxed ${isHovered ? "text-black" : "text-zinc-600"}`}>
-                        {cluster.purpose}
-                      </p>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-dashed border-border relative z-10">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[10px] uppercase font-bold tracking-widest">
-                          {isHovered ? "VIEW ACTIVE STREAM" : "INTERACTIVE CARDS"}
-                        </span>
-                        <ArrowRight size={14} className={isHovered ? "text-black animate-pulse" : "text-zinc-500"} />
+                    position="top"
+                    className="w-full h-full flex"
+                    content={
+                      <div className="space-y-1 p-0.5">
+                        <div className="font-bold text-[#00ff66]">{cluster.persona}</div>
+                        <div>{cluster.chatLogic}</div>
+                        <div className="text-[7.5px] text-zinc-500 border-t border-zinc-800 pt-1 mt-1 font-bold">
+                          Vault Context: {cluster.vaultContext}
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
+                    }
+                  >
+                    <motion.div
+                      onMouseEnter={() => setActiveHoverCluster(cluster.id)}
+                      onMouseLeave={() => setActiveHoverCluster(null)}
+                      whileHover={{
+                        scale: 1.015,
+                        zIndex: 10,
+                        transition: { duration: 0.15 }
+                      }}
+                      className={`p-6 border-b md:border-b-0 md:border-r border-border flex flex-col justify-between cursor-pointer relative overflow-hidden transition-colors duration-300 w-full h-full ${
+                        isHovered ? "bg-white text-black" : "bg-surface text-zinc-750"
+                      }`}
+                    >
+                      {/* Scrolling terminal stream background effect */}
+                      <motion.div
+                        initial={{ y: 0 }}
+                        animate={isHovered ? { y: [0, -250] } : { y: 0 }}
+                        transition={{
+                          ease: "linear",
+                          duration: 4,
+                          repeat: Infinity
+                        }}
+                        className="absolute inset-0 font-mono text-[8px] leading-none select-none pointer-events-none p-2 whitespace-nowrap overflow-hidden text-black opacity-[0.03] flex flex-col gap-1 z-0"
+                      >
+                        {Array.from({ length: 4 }).flatMap(() => SCROLLING_LINES).map((line, idx) => (
+                          <div key={idx}>{`> ${line}`}</div>
+                        ))}
+                      </motion.div>
+
+                      <div className="relative z-10">
+                        <span className={`font-mono text-[10px] font-bold tracking-widest block ${
+                          isHovered ? "text-black font-black" : "text-zinc-650"
+                        }`}>
+                          {cluster.tag}
+                        </span>
+                        
+                        <motion.h4 
+                          animate={isHovered ? {
+                            x: [0, -1.5, 1.5, -1, 1, -2, 2, 0],
+                            y: [0, 0.5, -0.5, 0, -1, 1, 0, 0],
+                          } : {}}
+                          transition={{ duration: 0.25 }}
+                          className={`text-lg font-black tracking-tight mt-3 uppercase leading-tight block ${
+                            isHovered ? "text-black" : "text-black/85"
+                          }`}
+                        >
+                          {cluster.title}
+                        </motion.h4>
+                        
+                        <p className={`text-xs mt-3 leading-relaxed ${isHovered ? "text-black" : "text-zinc-600"}`}>
+                          {cluster.purpose}
+                        </p>
+                      </div>
+
+                      <div className="mt-8 pt-4 border-t border-dashed border-border relative z-10">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[10px] uppercase font-bold tracking-widest">
+                            {isHovered ? "VIEW ACTIVE STREAM" : "INTERACTIVE CARDS"}
+                          </span>
+                          <ArrowRight size={14} className={isHovered ? "text-black animate-pulse" : "text-zinc-500"} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Tooltip>
                 );
               })}
             </section>

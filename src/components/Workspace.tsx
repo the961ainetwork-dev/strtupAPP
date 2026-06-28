@@ -5,12 +5,13 @@ import { TokenDiagnostics } from "./TokenDiagnostics";
 import { DealroomVC } from "./DealroomVC";
 import { YellowPagesDirectory } from "./YellowPagesDirectory";
 import { YellowPagesRepositories } from "./YellowPagesRepositories";
-import { SocialSentimentDeck } from "./SocialSentimentDeck";
+import { SocialIntelligence } from "./SocialIntelligence";
 import { PrivateMarketsAI } from "./PrivateMarketsAI";
 import { PricingPage } from "./PricingPage";
 import { AuthPage, UserAccount } from "./AuthPage";
 import { AdminPanel } from "./AdminPanel";
 import { DealroomDataExplorer } from "./DealroomDataExplorer";
+import { Tooltip } from "./Tooltip";
 import { 
   Terminal, ShieldCheck, Cpu, Upload, Trash2, 
   Send, HelpCircle, FileText, Check, Plus, 
@@ -484,130 +485,196 @@ export const Workspace: React.FC<WorkspaceProps> = ({
           {/* High-tech View Mode Switcher */}
           <div className="h-4 w-px bg-border hidden lg:block"></div>
           <div className="hidden lg:flex items-center bg-[#09090b] border border-border p-0.5 font-mono flex-wrap gap-0.5">
-            <button
-              id="btn-workspace-mode-chat"
-              onClick={() => setWorkspaceMode("grounded_ai")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "grounded_ai"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+            <Tooltip
+              position="bottom"
+              content="Primary direct prompt workspace grounded in the active cognitive pillar's persona and files"
             >
-              [ GROUNDED AI WORKSPACE ]
-            </button>
-            <button
-              id="btn-workspace-mode-dealroom"
-              onClick={() => setWorkspaceMode("dealroom_vc")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "dealroom_vc"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-chat"
+                onClick={() => setWorkspaceMode("grounded_ai")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "grounded_ai"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ GROUNDED AI WORKSPACE ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Simulate regional venture capital syndicates, portfolio metrics, and algorithmic seed deal flows"
             >
-              [ DEALROOM VC COCKPIT ]
-            </button>
-            <button
-              onClick={() => setWorkspaceMode("dealroom_data")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "dealroom_data"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-dealroom"
+                onClick={() => setWorkspaceMode("dealroom_vc")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "dealroom_vc"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ DEALROOM VC COCKPIT ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Structured lookup for regional sovereign deals, seed rounds, and fund metrics"
             >
-              [ 🗂 DEALROOM EXPLORER ]
-            </button>
-            <button
-              id="btn-workspace-mode-yellow-pages"
-              onClick={() => setWorkspaceMode("yellow_pages_directory")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "yellow_pages_directory"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-dealroom"
+                onClick={() => setWorkspaceMode("dealroom_data")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "dealroom_data"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ 🗂 DEALROOM EXPLORER ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Ecosystem directory of registered sovereign entities, tech founders, and research institutes"
             >
-              [ YELLOW PAGES DIRECTORY ]
-            </button>
-            <button
-              id="btn-workspace-mode-repos"
-              onClick={() => setWorkspaceMode("yellow_pages_repositories")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "yellow_pages_repositories"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-yellow-pages"
+                onClick={() => setWorkspaceMode("yellow_pages_directory")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "yellow_pages_directory"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ YELLOW PAGES DIRECTORY ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Open-source model adapters, RAG templates, and vetted software repository indices"
             >
-              [ REPOSITORIES ]
-            </button>
-            <button
-              id="btn-workspace-mode-social"
-              onClick={() => setWorkspaceMode("social_sentiment")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "social_sentiment"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-repos"
+                onClick={() => setWorkspaceMode("yellow_pages_repositories")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "yellow_pages_repositories"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ REPOSITORIES ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Scrape and analyze active sentiment confidence streams across 5 major social networks"
             >
-              [ SOCIAL AI SENTIMENT ]
-            </button>
-            <button
-              id="btn-workspace-mode-private-markets"
-              onClick={() => setWorkspaceMode("private_markets")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "private_markets"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-social"
+                onClick={() => setWorkspaceMode("social_sentiment")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "social_sentiment"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ SOCIAL INTELLIGENCE ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Machine-learning evaluations and predictive valuations for emerging private startup markets"
             >
-              [ PRIVATE MARKETS & STARTUPS ]
-            </button>
-            <button
-              onClick={() => setWorkspaceMode("pricing")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
-                workspaceMode === "pricing"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                id="btn-workspace-mode-private-markets"
+                onClick={() => setWorkspaceMode("private_markets")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "private_markets"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ PRIVATE MARKETS & STARTUPS ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Upgrade administrative tiers and secure higher token/rate allowances"
             >
-              [ PRICING ]
-            </button>
-            <button
-              onClick={() => setWorkspaceMode("auth")}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
-                workspaceMode === "auth"
-                  ? "bg-accent text-black font-black"
-                  : "text-zinc-400 hover:text-white"
-              }`}
+              <button
+                onClick={() => setWorkspaceMode("pricing")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors ${
+                  workspaceMode === "pricing"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                [ PRICING ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content={currentUser ? "View active user profile, permissions, and keys" : "Sign in to activate administrative capabilities"}
             >
-              <UserPlus size={10} />
-              {currentUser ? `[ ${currentUser.fullName.split(" ")[0].toUpperCase()} ]` : "[ SIGN IN ]"}
-            </button>
-            <button
-              onClick={() => {
-                if (currentUser?.role === "admin") {
-                  setWorkspaceMode("admin");
-                } else {
-                  setWorkspaceMode("auth");
-                  alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
-                }
-              }}
-              className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
-                workspaceMode === "admin"
-                  ? "bg-accent text-black font-black"
-                  : currentUser?.role === "admin"
-                  ? "text-[#00ff66] font-extrabold hover:text-[#00ff66]"
-                  : "text-zinc-500 hover:text-white"
-              }`}
+              <button
+                onClick={() => setWorkspaceMode("auth")}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                  workspaceMode === "auth"
+                    ? "bg-accent text-black font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                <UserPlus size={10} />
+                {currentUser ? `[ ${currentUser.fullName.split(" ")[0].toUpperCase()} ]` : "[ SIGN IN ]"}
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Secure administrative dashboard for logs, user moderation, and raw system overrides"
             >
-              {currentUser?.role === "admin" ? <Unlock size={10} className="text-[#00ff66] animate-pulse" /> : <Lock size={10} />}
-              [ ADMIN ]
-            </button>
-            <button
-              onClick={() => setShowGlobalSearch(true)}
-              className="px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer bg-accent text-black hover:bg-[#00e08b] transition-colors flex items-center gap-1"
-              title="Open Global Search (Ctrl+K)"
+              <button
+                onClick={() => {
+                  if (currentUser?.role === "admin") {
+                    setWorkspaceMode("admin");
+                  } else {
+                    setWorkspaceMode("auth");
+                    alert("Security Protocol: Accessing the Admin Cockpit requires an active Administrator session. Please sign up with the 'System Admin Preset' or login as admin@avant-garde.ai.");
+                  }
+                }}
+                className={`px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer transition-colors flex items-center gap-1 ${
+                  workspaceMode === "admin"
+                    ? "bg-accent text-black font-black"
+                    : currentUser?.role === "admin"
+                    ? "text-[#00ff66] font-extrabold hover:text-[#00ff66]"
+                    : "text-zinc-500 hover:text-white"
+                }`}
+              >
+                {currentUser?.role === "admin" ? <Unlock size={10} className="text-[#00ff66] animate-pulse" /> : <Lock size={10} />}
+                [ ADMIN ]
+              </button>
+            </Tooltip>
+
+            <Tooltip
+              position="bottom"
+              content="Omni-search index across sources, directory entities, and repositories (Ctrl+K)"
             >
-              <Command size={10} /> [ SEARCH ]
-            </button>
+              <button
+                onClick={() => setShowGlobalSearch(true)}
+                className="px-3 py-1 text-[10px] font-bold tracking-tight uppercase cursor-pointer bg-accent text-black hover:bg-[#00e08b] transition-colors flex items-center gap-1"
+                title="Open Global Search (Ctrl+K)"
+              >
+                <Command size={10} /> [ SEARCH ]
+              </button>
+            </Tooltip>
           </div>
         </div>
 
@@ -641,31 +708,56 @@ export const Workspace: React.FC<WorkspaceProps> = ({
             
             <div className="grid grid-cols-2 gap-1.5">
               {CLUSTERS.map(c => (
-                <button
+                <Tooltip
                   key={c.id}
-                  id={`btn-cluster-toggle-${c.id}`}
-                  onClick={() => setActiveClusterId(c.id)}
-                  className={`p-2 text-left border cursor-pointer font-mono text-[10px] font-bold tracking-tight leading-tight transition-all uppercase rounded-none ${
-                    activeClusterId === c.id
-                      ? "bg-accent text-black border-accent"
-                      : "bg-surface border-border text-text-dim hover:text-white hover:border-zinc-700"
-                  }`}
+                  position="top"
+                  className="w-full"
+                  content={
+                    <div className="space-y-1 p-0.5">
+                      <div className="font-black text-[#00ff66]">{c.persona.toUpperCase()}</div>
+                      <div className="text-zinc-400">{c.purpose}</div>
+                      <div className="text-[7.5px] text-zinc-500 border-t border-zinc-800 pt-1 mt-1 font-bold">
+                        TRIGGER: {c.hoverCommand}
+                      </div>
+                    </div>
+                  }
                 >
-                  <span className="block opacity-60 text-[8px] tracking-widest">{c.tag.split(" // ")[0]}</span>
-                  <span className="block truncate mt-0.5">{c.title.split(" & ")[0].split(" Tools")[0]}</span>
-                </button>
+                  <button
+                    id={`btn-cluster-toggle-${c.id}`}
+                    onClick={() => setActiveClusterId(c.id)}
+                    className="w-full p-2 text-left border cursor-pointer font-mono text-[10px] font-bold tracking-tight leading-tight transition-all uppercase rounded-none bg-surface border-border text-text-dim hover:text-white hover:border-zinc-700"
+                    style={activeClusterId === c.id ? { backgroundColor: "var(--color-accent)", color: "black", borderColor: "var(--color-accent)" } : {}}
+                  >
+                    <span className="block opacity-60 text-[8px] tracking-widest">{c.tag.split(" // ")[0]}</span>
+                    <span className="block truncate mt-0.5">{c.title.split(" & ")[0].split(" Tools")[0]}</span>
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
 
           {/* Persona Header Description Banner */}
-          <div className="p-3.5 bg-surface/50 border-b border-border text-[11px] leading-relaxed shrink-0 text-zinc-400">
-            <div className="font-mono font-bold text-zinc-200 uppercase flex items-center gap-1.5 mb-1 text-[10px]">
-              <Sparkles size={11} className="text-accent" /> Grounded Active Persona:
+          <Tooltip
+            position="bottom"
+            className="w-full shrink-0"
+            content={
+              <div className="space-y-1.5 p-1 max-w-[240px]">
+                <div className="font-bold text-white uppercase text-[8.5px]">PROMPTING & ORCHESTRATION SPECS:</div>
+                <div className="text-zinc-400 text-[8.5px] leading-normal">{activeCluster.chatLogic}</div>
+                <div className="border-t border-zinc-850 pt-1 text-zinc-500 text-[7.5px] leading-normal">
+                  <strong>Vault Grounding:</strong> {activeCluster.vaultContext}
+                </div>
+              </div>
+            }
+          >
+            <div className="p-3.5 bg-surface/50 border-b border-border text-[11px] leading-relaxed text-zinc-400 cursor-help">
+              <div className="font-mono font-bold text-zinc-200 uppercase flex items-center gap-1.5 mb-1 text-[10px]">
+                <Sparkles size={11} className="text-accent" /> Grounded Active Persona:
+              </div>
+              <p className="font-mono font-black text-accent uppercase text-[12px]">{activeCluster.persona}</p>
+              <p className="mt-1.5 text-zinc-400">{activeCluster.purpose}</p>
             </div>
-            <p className="font-mono font-black text-accent uppercase text-[12px]">{activeCluster.persona}</p>
-            <p className="mt-1.5 text-zinc-400">{activeCluster.purpose}</p>
-          </div>
+          </Tooltip>
 
           {/* The Source Vault List */}
           <div className="flex-grow flex flex-col overflow-hidden">
@@ -1101,8 +1193,8 @@ export const Workspace: React.FC<WorkspaceProps> = ({
             <PrivateMarketsAI />
           </div>
         ) : workspaceMode === "social_sentiment" ? (
-          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
-            <SocialSentimentDeck />
+          <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden bg-[#050505] text-white">
+            <SocialIntelligence />
           </div>
         ) : workspaceMode === "pricing" ? (
           <div className="w-full lg:w-[70%] border-r border-border flex flex-col overflow-hidden overflow-y-auto bg-white text-black">
